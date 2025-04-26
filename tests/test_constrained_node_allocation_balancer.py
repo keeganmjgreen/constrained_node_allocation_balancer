@@ -4,6 +4,7 @@ from src.constrained_node_allocation_balancer import (
     Node,
     constrained_node_allocation_balancer,
     make_ascii_barplot,
+    remove_inactive_constraints,
     set_root_allocation,
 )
 
@@ -82,21 +83,19 @@ class TestOnSimpleTwoLevelTree:
 
 
 class TestOnThreeLevelTree:
-    @pytest.mark.parametrize("root_limit", [None, 3])
-    def test_allocating_to_leaves_without_limiting_parent(
-        self, root_limit: float | None
-    ):
+
+    def test_(self):
         # Given:
         root = Node(
-            limit=root_limit,
             children=[
-                Node(limit=2),
-                Node(limit=1),
+                Node(limit=2, children=[Node(limit=1)]),
+                Node(limit=9, children=[Node(limit=10)]),
             ],
         )
         set_root_allocation(root)
-        assert root.allotment == 3
+        assert root.allotment == 10
         # When:
+        remove_inactive_constraints(root)
         constrained_node_allocation_balancer(root)
         # Then:
         assert root.all_leaf_allotments == {

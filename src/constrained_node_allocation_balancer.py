@@ -182,6 +182,10 @@ def set_root_allocation(tree: Node) -> None:
             descendent.allotment = 0.0
 
 
+def remove_inactive_constraints(tree: Node) -> None:
+    pass
+
+
 def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
     assert tree.allotment is not None
 
