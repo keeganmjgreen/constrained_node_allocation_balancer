@@ -1,32 +1,42 @@
 from __future__ import annotations
 
 import dataclasses
+from copy import deepcopy
 from itertools import groupby
 
-from ete3 import Tree
+from treelib import Tree
+
+from src.utils import closest_value_in_array
 
 
 @dataclasses.dataclass
 class Node:
     id: str = dataclasses.field(init=False)
+    _id_suffix: str = dataclasses.field(init=False)
     limit: float | None = None
     children: list[Node] = dataclasses.field(default_factory=list)
     parent: Node | None = dataclasses.field(default=None, repr=False)
-    is_root: bool = False
     level: int = dataclasses.field(init=False, repr=False)
     allotment: float = 0.0
 
     def __post_init__(self):
         for child in self.children:
             child.parent = self
-        if self.is_root:
+        # Set IDs and levels if this is the root node:
+        if self.parent is None:
             self._set_ids()
             self._set_levels()
 
-    def _set_ids(self, starting_id: str = "1") -> None:
-        self.id = starting_id
+    def _set_ids(
+        self, starting_at: str = "1", parent_id: str | None = None, separator: str = "|"
+    ) -> None:
+        self._id_suffix = starting_at
+        if self.parent is None:
+            self.id = self._id_suffix
+        else:
+            self.id = parent_id + separator + self._id_suffix
         for i, child in enumerate(self.children):
-            child._set_ids(starting_id=f"{self.id}|{i + 1}")
+            child._set_ids(starting_at=str(i + 1), parent_id=self.id)
 
     def _set_levels(self, starting_level: int = 0) -> None:
         self.level = starting_level
@@ -102,17 +112,60 @@ class Node:
         if self.parent is not None:
             return [n for n in self.neighbors if n.has_headroom]
 
-    def as_tree(self) -> Tree:
+    def show(self) -> None:
         tree = Tree()
-        attributes = ["id", "limit", "allotment"]
-        for attribute in attributes:
-            setattr(tree, attribute, getattr(self, attribute))
-        for child in self.children:
-            tree.add_child(child.as_tree())
-        return tree
+        all_nodes = [self, *self.all_descendents]
+        max_id_suffix_len = max(len(n._id_suffix) for n in all_nodes)
+        max_depth = max(n.level for n in all_nodes)
+        max_allotment_str_len = max(len(f"{n.allotment:.3f}") for n in all_nodes)
+        max_limit_str_len = max(
+            len(f"{n.limit:.3f}") for n in all_nodes if n.limit is not None
+        )
+        max_limit = max(n.limit for n in all_nodes if n.limit is not None)
+        for node in all_nodes:
+            tree.create_node(
+                identifier=node.id,
+                tag=node._tree_repr(
+                    max_id_suffix_len,
+                    max_depth,
+                    max_allotment_str_len,
+                    max_limit_str_len,
+                    max_limit,
+                ),
+                parent=(node.parent.id if node.parent else None),
+            )
+        tree.show()
 
-    def __repr__(self) -> None:
-        return self.as_tree().get_ascii(attributes=["id", "limit", "allotment"])
+    def _tree_repr(
+        self,
+        max_id_suffix_len: int,
+        max_depth: int,
+        max_allotment_str_len: int,
+        max_limit_str_len: int,
+        max_limit: float,
+        indent_per_level: int = 4,
+        max_bar_width: int = 50,
+    ) -> str:
+
+        def pad(string: str, width: int) -> str:
+            return string + " " * (width - len(string))
+
+        repr = (
+            pad(self._id_suffix, max_id_suffix_len)
+            + " "
+            + " " * indent_per_level * (max_depth - self.level)
+            + " "
+            + f"{pad(f'{self.allotment:.3f}', max_allotment_str_len)}"
+        )
+        if self.limit is not None:
+            repr += f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
+            barplot = make_ascii_barplot(
+                value=self.allotment,
+                max_value=self.limit,
+                width=int(self.limit / max_limit * max_bar_width),
+            )
+            repr += f"|{barplot}|"
+            return repr
 
 
 def set_root_allocation(tree: Node) -> None:
@@ -134,7 +187,7 @@ def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
 
     def echo():
         if show:
-            print(tree)
+            tree.show()
 
     echo()
     for level, level_nodes in tree.nodes_by_level.items():
@@ -164,12 +217,47 @@ def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
         echo()
 
 
+def make_ascii_barplot(
+    value: int | float,
+    max_value: int | float | None = None,
+    width: int | None = None,
+    block_elements: dict[int | float, str] | None = None,
+) -> str:
+    if (max_value is None) is not (width is None):
+        raise ValueError(
+            "If `max_value` is specified, so must `width`, and vice versa."
+        )
+    if max_value is not None:
+        # Normalize to `width` using `max_value`:
+        value = deepcopy(value / max_value * width)
+    if block_elements is None:
+        block_elements = {
+            1 / 8: "▏",
+            2 / 8: "▎",
+            3 / 8: "▍",
+            4 / 8: "▌",
+            5 / 8: "▋",
+            6 / 8: "▊",
+            7 / 8: "▉",
+            8 / 8: "█",
+        }
+    base_part = int(value // 1) * block_elements[1]
+    fractional_part = block_elements[
+        closest_value_in_array(value % 1, list(block_elements.keys()))
+    ]
+    if width is not None:
+        remaining_part = (width - len(base_part) - 1) * " "
+    else:
+        remaining_part = ""
+    return base_part + fractional_part + remaining_part
+
+
 if __name__ == "__main__":
     tree = Node(
         limit=10,
         children=[
             Node(
-                limit=5,  # 6
+                limit=5,  # 6,
                 children=[
                     Node(
                         limit=3,
@@ -195,15 +283,14 @@ if __name__ == "__main__":
                 ],
             ),
             Node(
-                limit=3,  # 2
+                limit=3,  # 2,
                 children=[
                     Node(limit=2),
                     Node(limit=2),
                 ],
             ),
         ],
-        is_root=True,
     )
     set_root_allocation(tree)
     constrained_node_allocation_balancer(tree, show=False)
-    print(tree)
+    tree.show()

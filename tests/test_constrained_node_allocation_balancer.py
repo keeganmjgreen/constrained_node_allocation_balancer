@@ -3,6 +3,7 @@ import pytest
 from src.constrained_node_allocation_balancer import (
     Node,
     constrained_node_allocation_balancer,
+    make_ascii_barplot,
     set_root_allocation,
 )
 
@@ -19,7 +20,6 @@ class TestOnSimpleTwoLevelTree:
                 Node(limit=2),
                 Node(limit=1),
             ],
-            is_root=True,
         )
         set_root_allocation(root)
         assert root.allotment == 3
@@ -39,7 +39,6 @@ class TestOnSimpleTwoLevelTree:
                 Node(limit=2),
                 Node(limit=1),
             ],
-            is_root=True,
         )
         set_root_allocation(root)
         assert root.allotment == 2
@@ -69,7 +68,6 @@ class TestOnSimpleTwoLevelTree:
                 Node(limit=4),
                 # ^ Node 1|3's initial allotment does NOT exceed its limit (node has headroom).
             ],
-            is_root=True,
         )
         set_root_allocation(root)
         assert root.allotment == 6
@@ -95,7 +93,6 @@ class TestOnThreeLevelTree:
                 Node(limit=2),
                 Node(limit=1),
             ],
-            is_root=True,
         )
         set_root_allocation(root)
         assert root.allotment == 3
@@ -106,3 +103,10 @@ class TestOnThreeLevelTree:
             "1|1": 2,
             "1|2": 1,
         }
+
+
+def test_make_ascii_barplot():
+    assert make_ascii_barplot(4) == "████▏"
+    assert make_ascii_barplot(4.2) == "████▎"
+    assert make_ascii_barplot(4.2, max_value=5, width=10) == "████████▍ "
+    assert make_ascii_barplot(4.2, max_value=10, width=5) == "██▏  "
