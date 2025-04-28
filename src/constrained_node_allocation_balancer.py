@@ -16,7 +16,16 @@ def set_root_allotment(tree: Node) -> None:
 
 
 def remove_inactive_constraints(tree: Node) -> None:
-    pass
+    for level_nodes in reversed(tree.nodes_by_level.values()):
+        for node in level_nodes:
+            if (
+                node.limit is not None
+                and len(node.children) > 0
+                and sum(n.limit for n in node.children) <= node.limit
+            ):
+                # The node's limit can never be reached due to the limits of its children.
+                # Remove the node's limit:
+                node.limit = None
 
 
 def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:

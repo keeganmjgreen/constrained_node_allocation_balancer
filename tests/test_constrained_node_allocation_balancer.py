@@ -23,6 +23,7 @@ class TestOnSimpleTwoLevelTree:
         )
         set_root_allotment(root)
         assert root.allotment == 3
+        remove_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
         # Then:
@@ -42,6 +43,7 @@ class TestOnSimpleTwoLevelTree:
         )
         set_root_allotment(root)
         assert root.allotment == 2
+        remove_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
         # Then:
@@ -71,6 +73,7 @@ class TestOnSimpleTwoLevelTree:
         )
         set_root_allotment(root)
         assert root.allotment == 6
+        remove_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
         # Then:
@@ -93,6 +96,7 @@ class TestOnThreeLevelTree:
         )
         set_root_allotment(root)
         assert root.allotment == 10
+        remove_inactive_constraints(root)
         # When:
         remove_inactive_constraints(root)
         constrained_node_allocation_balancer(root)
