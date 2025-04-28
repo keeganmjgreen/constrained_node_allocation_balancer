@@ -1,12 +1,11 @@
 import pytest
 
-from src.constrained_node_allocation_balancer import (
-    Node,
+from constrained_node_allocation_balancer import (
     constrained_node_allocation_balancer,
-    make_ascii_barplot,
     remove_inactive_constraints,
     set_root_allocation,
 )
+from node import Node
 
 
 class TestOnSimpleTwoLevelTree:
@@ -102,10 +101,3 @@ class TestOnThreeLevelTree:
             "1|1": 2,
             "1|2": 1,
         }
-
-
-def test_make_ascii_barplot():
-    assert make_ascii_barplot(4) == "████▏"
-    assert make_ascii_barplot(4.2) == "████▎"
-    assert make_ascii_barplot(4.2, max_value=5, width=10) == "████████▍ "
-    assert make_ascii_barplot(4.2, max_value=10, width=5) == "██▏  "
