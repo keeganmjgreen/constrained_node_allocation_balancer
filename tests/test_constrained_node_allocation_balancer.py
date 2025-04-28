@@ -3,7 +3,7 @@ import pytest
 from constrained_node_allocation_balancer import (
     constrained_node_allocation_balancer,
     remove_inactive_constraints,
-    set_root_allocation,
+    set_root_allotment,
 )
 from node import Node
 
@@ -21,7 +21,7 @@ class TestOnSimpleTwoLevelTree:
                 Node(limit=1),
             ],
         )
-        set_root_allocation(root)
+        set_root_allotment(root)
         assert root.allotment == 3
         # When:
         constrained_node_allocation_balancer(root)
@@ -40,7 +40,7 @@ class TestOnSimpleTwoLevelTree:
                 Node(limit=1),
             ],
         )
-        set_root_allocation(root)
+        set_root_allotment(root)
         assert root.allotment == 2
         # When:
         constrained_node_allocation_balancer(root)
@@ -69,7 +69,7 @@ class TestOnSimpleTwoLevelTree:
                 # ^ Node 1|3's initial allotment does NOT exceed its limit (node has headroom).
             ],
         )
-        set_root_allocation(root)
+        set_root_allotment(root)
         assert root.allotment == 6
         # When:
         constrained_node_allocation_balancer(root)
@@ -91,7 +91,7 @@ class TestOnThreeLevelTree:
                 Node(limit=9, children=[Node(limit=10)]),
             ],
         )
-        set_root_allocation(root)
+        set_root_allotment(root)
         assert root.allotment == 10
         # When:
         remove_inactive_constraints(root)

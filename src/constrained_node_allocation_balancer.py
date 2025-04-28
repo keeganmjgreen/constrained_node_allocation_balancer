@@ -1,7 +1,7 @@
 from node import Node
 
 
-def set_root_allocation(tree: Node) -> None:
+def set_root_allotment(tree: Node) -> None:
     for leaf in tree.all_leaves:
         leaf.allotment = min(
             n.remaining_budget
