@@ -1,0 +1,19 @@
+[project]
+name = "constrained_node_allocation_balancer"
+version = "1.0.0"
+requires-python = ">=3.8"
+dependencies = ["treelib<2", "pytest (>=8.3.5,<9.0.0)"]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = ["tests"]
+
+[tool.ruff]
+src = ["src"]
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "N", "DTZ", "RUF", "PERF"]
+ignore = [
+    "E501", # Line too long.
+]
