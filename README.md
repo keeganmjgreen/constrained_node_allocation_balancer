@@ -31,13 +31,13 @@ The algorithm's first step is determining the allotment of the tree's root node.
 
 Theorem: The root allotment will be the same regardless of the order in which the leaves are iterated over, even if the leaf allotments would in general be different. In other words, every `Node.children: list[Node]` can be reordered arbitrarily without consequence.
 
-### Step 2: Remove inactive constraints
+### Step 2: Adjust inactive constraints
 
-*Function `remove_inactive_constraints`.*
+*Function `adjust_inactive_constraints`.*
 
-The tree may have nodes whose limits can never be reached due to the limits of those nodes's children. Such nodes will be referred to as inactive nodes because they represent inactive constraints; they do not end up limiting their own allotment or that of their children. Inactive nodes TODO
+The tree may have nodes without limits or nodes whose limits can never be reached due to the limits of those nodes's children. Such nodes will be referred to as inactive nodes because they represent inactive constraints; they do not end up limiting their own allotment or that of their children. Inactive nodes TODO
 
-The algorithm's second step is removing the limits from any inactive nodes.
+The algorithm's second step is adjusting the limits of any inactive nodes.
 
 ### Step 3: Balance the descendent nodes' allotments
 

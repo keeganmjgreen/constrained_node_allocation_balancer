@@ -15,17 +15,15 @@ def set_root_allotment(tree: Node) -> None:
             descendent.allotment = 0.0
 
 
-def remove_inactive_constraints(tree: Node) -> None:
+def adjust_inactive_constraints(tree: Node) -> None:
     for level_nodes in reversed(tree.nodes_by_level.values()):
         for node in level_nodes:
-            if (
-                node.limit is not None
-                and len(node.children) > 0
-                and sum(n.limit for n in node.children) <= node.limit
+            if len(node.children) > 0 and (
+                node.limit is None or sum(n.limit for n in node.children) <= node.limit
             ):
-                # The node's limit can never be reached due to the limits of its children.
-                # Remove the node's limit:
-                node.limit = None
+                # The node has no limit, or the node's limit can never be reached due to its
+                #     children's limits. Set the node's limit to the sum of its children's limits:
+                node.limit = sum(n.limit for n in node.children)
 
 
 def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
