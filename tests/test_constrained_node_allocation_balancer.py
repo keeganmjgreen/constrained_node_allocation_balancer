@@ -59,9 +59,9 @@ class TestOnSimpleTwoLevelTree:
             children=[
                 # These nodes' allotment will start at root.allotment / 3 nodes = 2 units each.
                 Node(limit=2),
-                # ^ Node 1|1's initial allotment does NOT exceed its limit (node has headroom).
+                # ^ Node 1|1's initial allotment does NOT exceed its limit.
                 Node(limit=1),
-                # ^ Node 1|2's initial allotment DOES exceed its limit by 1 unit.
+                # ^ Node 1|2's initial allotment DOES exceed its limit, by 1 unit.
                 #     This excess will be redistributed among the node's neighbors that have headroom,
                 #     allocating 0.5 more units to each of nodes 1|1 and 1|3.
                 #     As a result, node 1|1's allotment will end up exceeding its limit by 0.5 units.
