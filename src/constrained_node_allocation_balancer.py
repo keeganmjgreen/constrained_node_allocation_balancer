@@ -42,12 +42,13 @@ def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
             for node in level_nodes:
                 if node.limit_exceeded:
                     excess = node.allotment - node.limit
-                    for neighbor in node.neighbors_with_headroom:
+                    neighbors_with_headroom = node.neighbors_with_headroom
+                    for neighbor in neighbors_with_headroom:
                         neighbor.allotment += (
                             excess
                             / sum(
                                 neighbor.n_leaves_at_or_below
-                                for neighbor in node.neighbors_with_headroom
+                                for neighbor in neighbors_with_headroom
                             )
                             * neighbor.n_leaves_at_or_below
                         )
