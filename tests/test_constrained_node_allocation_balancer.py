@@ -55,32 +55,32 @@ class TestOnSimpleTwoLevelTree:
     def test_allocating_to_leaves_when_redistribution_is_necessary(self):
         # Given:
         root = Node(
-            limit=6,
+            limit=15,
             children=[
-                # These nodes' allotment will start at root.allotment / 3 nodes = 2 units each.
-                Node(limit=2),
+                # These nodes' allotment will start at root.allotment / 3 nodes = 5 units each.
+                Node(limit=6),
                 # ^ Node 1|1's initial allotment does NOT exceed its limit.
                 Node(limit=1),
-                # ^ Node 1|2's initial allotment DOES exceed its limit, by 1 unit.
-                #     This excess will be redistributed among the node's neighbors that have headroom,
-                #     allocating 0.5 more units to each of nodes 1|1 and 1|3.
-                #     As a result, node 1|1's allotment will end up exceeding its limit by 0.5 units.
-                #     This excess will be redistributed among node 1|1's remaining neighbors that have
-                #     headroom (in this case, only node 1|3).
-                Node(limit=4),
+                # ^ Node 1|2's initial allotment DOES exceed its limit, by 4 units.
+                #     This excess will be redistributed among the node's neighbors that have
+                #     headroom, allocating 2 more units to each of nodes 1|1 and 1|3.
+                #     As a result, node 1|1's allotment will end up exceeding its limit by 1 unit.
+                #     This excess will be redistributed among node 1|1's remaining neighbors that
+                #     have headroom (in this case, only node 1|3).
+                Node(limit=9),
                 # ^ Node 1|3's initial allotment does NOT exceed its limit (node has headroom).
             ],
         )
         set_root_allotment(root)
-        assert root.allotment == 6
+        assert root.allotment == 15
         remove_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
         # Then:
         assert root.all_leaf_allotments == {
-            "1|1": 2,
+            "1|1": 6,
             "1|2": 1,
-            "1|3": 3,
+            "1|3": 8,
         }
 
 
