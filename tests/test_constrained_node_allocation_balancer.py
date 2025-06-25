@@ -86,6 +86,42 @@ class TestOnSimpleTwoLevelTree:
 
 class TestOnThreeLevelTree:
 
+    def test_raising_if_any_branches_without_limit(self):
+        raise AssertionError()
+
+    def test_allocating_to_leaves_in_proportion_to_n_leaves_at_or_below(self):
+        """Test balancing allocation among leaves regardless of depth."""
+        # Given:
+        root = Node(
+            limit=4,
+            children=[
+                Node(limit=1),
+                Node(
+                    children=[
+                        Node(limit=2),
+                    ]
+                ),
+                Node(
+                    children=[
+                        Node(limit=3),
+                        Node(limit=4),
+                    ]
+                ),
+            ],
+        )
+        set_root_allotment(root)
+        assert root.allotment == 4
+        adjust_inactive_constraints(root)
+        # When:
+        constrained_node_allocation_balancer(root)
+        # Then:
+        assert root.all_leaf_allotments == {
+            "1|1": 1,
+            "1|2|1": 1,
+            "1|3|1": 1,
+            "1|3|2": 1,
+        }
+
     def test_allocating_to_leaves_when_adjusting_inactive_constraint_is_necessary(self):
         # Given:
         root = Node(

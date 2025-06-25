@@ -8,6 +8,8 @@ The constrained node allocation balancer is an algorithm designed for tree data 
 
 The algorithm distributes, or balances, the allotments among the leaf nodes as evenly as possible given the aforementioned constraint.
 
+max
+
 ## Getting started
 
 Assuming you are using a Linux-based OS:
