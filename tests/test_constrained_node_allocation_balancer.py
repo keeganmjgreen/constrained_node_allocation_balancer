@@ -196,20 +196,57 @@ class TestOnThreeLevelTree:
         root = Node(
             children=[
                 Node(
-                    limit=2,  # Inactive limit; will be adjusted to `1`.
-                    children=[Node(limit=1)],
+                    limit=20,  # Inactive limit; will be adjusted to `10`.
+                    children=[Node(limit=10)],
                 ),
                 Node(
-                    limit=9,  # Active limit.
-                    children=[Node(limit=10)],
+                    limit=80,  # Active limit.
+                    children=[Node(limit=100)],
                 ),
             ],
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 10
+        assert root.allotment == 90
         # Then:
         assert root.all_leaf_allotments == {
-            "1|1|1": 1,
-            "1|2|1": 9,  # Would be `8` without `_adjust_inactive_limits`.
+            "1|1|1": 10,
+            "1|2|1": 80,  # Would be `70` without `_adjust_inactive_limits`.
+        }
+
+
+class TestOnFourLevelTree:
+    def test_allocating_to_leaves_when_adjusting_inactive_limit_is_necessary(
+        self,
+    ) -> None:
+        # Given:
+        root = Node(
+            children=[
+                Node(
+                    limit=20,  # Inactive limit; will be adjusted to `10`.
+                    children=[
+                        Node(
+                            limit=2,  # Inactive limit; will be adjusted to `1`.
+                            children=[Node(limit=1)],
+                        ),
+                        Node(
+                            limit=8,  # Active limit.
+                            children=[Node(limit=10)],
+                        ),
+                    ],
+                ),
+                Node(
+                    limit=80,  # Active limit.
+                    children=[Node(limit=100)],
+                ),
+            ],
+        )
+        # When:
+        constrained_node_allocation_balancer(root)
+        assert root.allotment == 89
+        # Then:
+        assert root.all_leaf_allotments == {
+            "1|1|1|1": 1,
+            "1|1|2|1": 8,
+            "1|2|1": 80,  # Would be `70` without `_adjust_inactive_limits`.
         }

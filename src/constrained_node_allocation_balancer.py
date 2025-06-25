@@ -29,7 +29,7 @@ def _set_root_allotment(tree: Node) -> None:
 
 
 def _adjust_inactive_limits(tree: Node) -> None:
-    for level_nodes in reversed(tree.nodes_by_level.values()):  # Root first.
+    for level_nodes in reversed(tree.nodes_by_level.values()):  # Root last.
         for node in level_nodes:
             children_throughput = sum(n.limit for n in node.children)
             if len(node.children) > 0 and (
