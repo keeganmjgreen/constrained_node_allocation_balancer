@@ -1,18 +1,36 @@
 import pytest
 
 from constrained_node_allocation_balancer import (
-    adjust_inactive_constraints,
+    AncestorChainWithoutLimitError,
     constrained_node_allocation_balancer,
-    set_root_allotment,
 )
 from node import Node
+
+
+def test_raising_if_any_branches_without_limit() -> None:
+    with pytest.raises(AncestorChainWithoutLimitError):
+        constrained_node_allocation_balancer(Node(limit=None))
+    with pytest.raises(AncestorChainWithoutLimitError):
+        constrained_node_allocation_balancer(
+            Node(limit=None, children=[Node(limit=1), Node(limit=None)])
+        )
+    with pytest.raises(AncestorChainWithoutLimitError):
+        constrained_node_allocation_balancer(
+            Node(
+                limit=None,
+                children=[
+                    Node(limit=1),
+                    Node(limit=None, children=[Node(limit=1), Node(limit=None)]),
+                ],
+            )
+        )
 
 
 class TestOnSimpleTwoLevelTree:
     @pytest.mark.parametrize("root_limit", [None, 3])
     def test_allocating_to_leaves_without_limiting_parent(
         self, root_limit: float | None
-    ):
+    ) -> None:
         # Given:
         root = Node(
             limit=root_limit,
@@ -21,18 +39,16 @@ class TestOnSimpleTwoLevelTree:
                 Node(limit=1),
             ],
         )
-        set_root_allotment(root)
-        assert root.allotment == 3
-        adjust_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
+        assert root.allotment == 3
         # Then:
         assert root.all_leaf_allotments == {
             "1|1": 2,
             "1|2": 1,
         }
 
-    def test_allocating_to_leaves(self):
+    def test_allocating_to_leaves(self) -> None:
         # Given:
         root = Node(
             limit=2,
@@ -41,18 +57,16 @@ class TestOnSimpleTwoLevelTree:
                 Node(limit=1),
             ],
         )
-        set_root_allotment(root)
-        assert root.allotment == 2
-        adjust_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
+        assert root.allotment == 2
         # Then:
         assert root.all_leaf_allotments == {
             "1|1": 1,
             "1|2": 1,
         }
 
-    def test_allocating_to_leaves_when_redistribution_is_necessary(self):
+    def test_allocating_to_leaves_when_redistribution_is_necessary(self) -> None:
         # Given:
         root = Node(
             limit=15,
@@ -71,11 +85,9 @@ class TestOnSimpleTwoLevelTree:
                 # ^ Node 1|3's initial allotment does NOT exceed its limit (node has headroom).
             ],
         )
-        set_root_allotment(root)
-        assert root.allotment == 15
-        adjust_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
+        assert root.allotment == 15
         # Then:
         assert root.all_leaf_allotments == {
             "1|1": 6,
@@ -86,10 +98,7 @@ class TestOnSimpleTwoLevelTree:
 
 class TestOnThreeLevelTree:
 
-    def test_raising_if_any_branches_without_limit(self):
-        raise AssertionError()
-
-    def test_allocating_to_leaves_in_proportion_to_n_leaves_at_or_below(self):
+    def test_allocating_to_leaves_in_proportion_to_n_leaves_at_or_below(self) -> None:
         """Test balancing allocation among leaves regardless of depth."""
         # Given:
         root = Node(
@@ -109,11 +118,9 @@ class TestOnThreeLevelTree:
                 ),
             ],
         )
-        set_root_allotment(root)
-        assert root.allotment == 4
-        adjust_inactive_constraints(root)
         # When:
         constrained_node_allocation_balancer(root)
+        assert root.allotment == 4
         # Then:
         assert root.all_leaf_allotments == {
             "1|1": 1,
@@ -122,7 +129,9 @@ class TestOnThreeLevelTree:
             "1|3|2": 1,
         }
 
-    def test_allocating_to_leaves_when_adjusting_inactive_constraint_is_necessary(self):
+    def test_allocating_to_leaves_when_adjusting_inactive_constraint_is_necessary(
+        self,
+    ) -> None:
         # Given:
         root = Node(
             children=[
@@ -130,13 +139,11 @@ class TestOnThreeLevelTree:
                 Node(limit=9, children=[Node(limit=10)]),
             ],
         )
-        set_root_allotment(root)
-        assert root.allotment == 10
         # When:
-        adjust_inactive_constraints(root)
         constrained_node_allocation_balancer(root)
+        assert root.allotment == 10
         # Then:
         assert root.all_leaf_allotments == {
             "1|1|1": 1,
-            "1|2|1": 9,  # Would be `8` without `adjust_inactive_constraints`.
+            "1|2|1": 9,  # Would be `8` without `_adjust_inactive_constraints`.
         }

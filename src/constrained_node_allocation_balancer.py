@@ -1,13 +1,23 @@
 from node import Node
 
 
-def set_root_allotment(tree: Node) -> None:
+def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
+    _set_root_allotment(tree)
+    _adjust_inactive_constraints(tree)
+    _balance_allocations(tree, show)
+
+
+def _set_root_allotment(tree: Node) -> None:
     for leaf in tree.all_leaves:
-        leaf.allotment = min(
+        ancestral_budgets = [
             n.remaining_budget
             for n in [leaf, *leaf.ancestor_chain]
             if n.limit is not None
-        )
+        ]
+        if len(ancestral_budgets) == 0:
+            raise AncestorChainWithoutLimitError
+        if leaf is not tree:
+            leaf.allotment = min(ancestral_budgets)
         for a in leaf.ancestor_chain:
             a.allotment += leaf.allotment
     for descendent in tree.all_descendents:
@@ -15,8 +25,8 @@ def set_root_allotment(tree: Node) -> None:
             descendent.allotment = 0.0
 
 
-def adjust_inactive_constraints(tree: Node) -> None:
-    for level_nodes in reversed(tree.nodes_by_level.values()):
+def _adjust_inactive_constraints(tree: Node) -> None:
+    for level_nodes in reversed(tree.nodes_by_level.values()):  # Root first.
         for node in level_nodes:
             if len(node.children) > 0 and (
                 node.limit is None or sum(n.limit for n in node.children) <= node.limit
@@ -26,7 +36,7 @@ def adjust_inactive_constraints(tree: Node) -> None:
                 node.limit = sum(n.limit for n in node.children)
 
 
-def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
+def _balance_allocations(tree: Node, show: bool = True) -> None:
     assert tree.allotment is not None
 
     def echo():
@@ -60,3 +70,7 @@ def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
                     * child.n_leaves_at_or_below
                 )
         echo()
+
+
+class AncestorChainWithoutLimitError(Exception):
+    pass

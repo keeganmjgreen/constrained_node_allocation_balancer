@@ -75,18 +75,18 @@ class Node:
 
     @property
     def all_leaves(self) -> list[Node]:
-        leaves: list[Node] = []
-        for child in self.children:
-            if len(child.children) > 0:
+        if len(self.children) > 0:
+            leaves: list[Node] = []
+            for child in self.children:
                 leaves += child.all_leaves
-            else:
-                leaves.append(child)
-        return leaves
+            return leaves
+        else:
+            return [self]
 
     @property
     def n_leaves_at_or_below(self) -> int:
         """Return the number of leaves under the node, or `1` if the node is a leaf."""
-        return len(self.all_leaves) or 1
+        return len(self.all_leaves)
 
     @property
     def all_leaf_allotments(self) -> dict[str, float]:
