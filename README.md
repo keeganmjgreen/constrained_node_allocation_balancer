@@ -41,7 +41,7 @@ The tree may have nodes without limits or nodes whose limits can never be reache
 
 The algorithm's second step is adjusting the limits of any inactive nodes.
 
-### Step 3: Balance the descendent nodes' allotments
+### Step 3: Balance the descendant nodes' allotments
 
 *Function `constrained_node_allocation_balancer`.*
 
@@ -53,7 +53,7 @@ The tree is traversed from root to leaves because...
 
 The tree is traversed level by level (iterating over the nodes at each level) because...
 
-Theorem: When distributing the root allotment level by level, root to leaves, it is impossible for a node X to receive an allotment that is too much for its descendants. Say the leaves among those descendents were the first to be iterated over and thus recieved the largest possible allotment satisfying their and their parents' limits. If node X's limit was reached, then node X's descendants are guaranteed to have headroom. If node X's limit was not reached,
+Theorem: When distributing the root allotment level by level, root to leaves, it is impossible for a node X to receive an allotment that is too much for its descendants. Say the leaves among those descendants were the first to be iterated over and thus recieved the largest possible allotment satisfying their and their parents' limits. If node X's limit was reached, then node X's descendants are guaranteed to have headroom. If node X's limit was not reached,
 Remove inactive
 
 Limiting children???

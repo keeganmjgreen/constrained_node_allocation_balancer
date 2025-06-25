@@ -16,13 +16,12 @@ def _set_root_allotment(tree: Node) -> None:
         ]
         if len(ancestral_budgets) == 0:
             raise AncestorChainWithoutLimitError
-        if leaf is not tree:
-            leaf.allotment = min(ancestral_budgets)
+        leaf.allotment = min(ancestral_budgets)
         for a in leaf.ancestor_chain:
             a.allotment += leaf.allotment
-    for descendent in tree.all_descendents:
-        if descendent is not tree:
-            descendent.allotment = 0.0
+    for descendant in tree.all_descendants:
+        if descendant is not tree:
+            descendant.allotment = 0.0
 
 
 def _adjust_inactive_constraints(tree: Node) -> None:

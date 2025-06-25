@@ -26,7 +26,16 @@ def test_raising_if_any_branches_without_limit() -> None:
         )
 
 
-class TestOnSimpleTwoLevelTree:
+def test_on_one_level_tree() -> None:
+    # Given:
+    root = Node(limit=1)
+    # When:
+    constrained_node_allocation_balancer(root)
+    # Then:
+    assert root.all_leaf_allotments == {"1": 1}
+
+
+class TestOnTwoLevelTree:
     @pytest.mark.parametrize("root_limit", [None, 3])
     def test_allocating_to_leaves_without_limiting_parent(
         self, root_limit: float | None

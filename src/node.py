@@ -60,18 +60,18 @@ class Node:
         return {
             k: list(g)
             for k, g in groupby(
-                sorted([self, *self.all_descendents], key=(lambda node: node.level)),
+                sorted([self, *self.all_descendants], key=(lambda node: node.level)),
                 key=(lambda node: node.level),
             )
         }
 
     @property
-    def all_descendents(self) -> list[Node]:
-        descendents: list[Node] = []
+    def all_descendants(self) -> list[Node]:
+        descendants: list[Node] = []
         for child in self.children:
-            descendents.append(child)
-            descendents += child.all_descendents
-        return descendents
+            descendants.append(child)
+            descendants += child.all_descendants
+        return descendants
 
     @property
     def all_leaves(self) -> list[Node]:
@@ -113,7 +113,7 @@ class Node:
 
     def show(self) -> None:
         tree = Tree()
-        all_nodes = [self, *self.all_descendents]
+        all_nodes = [self, *self.all_descendants]
         max_id_suffix_len = max(len(n._id_suffix) for n in all_nodes)
         max_depth = max(n.level for n in all_nodes)
         max_allotment_str_len = max(len(f"{n.allotment:.3f}") for n in all_nodes)
