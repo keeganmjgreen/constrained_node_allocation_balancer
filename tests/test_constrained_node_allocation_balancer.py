@@ -135,8 +135,14 @@ class TestOnThreeLevelTree:
         # Given:
         root = Node(
             children=[
-                Node(limit=2, children=[Node(limit=1)]),
-                Node(limit=9, children=[Node(limit=10)]),
+                Node(
+                    limit=2,  # Inactive constraint; will be adjusted to `1`.
+                    children=[Node(limit=1)],
+                ),
+                Node(
+                    limit=9,  # Active constraint.
+                    children=[Node(limit=10)],
+                ),
             ],
         )
         # When:
