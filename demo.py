@@ -1,7 +1,4 @@
-from constrained_node_allocation_balancer import (
-    _set_root_allotment,
-    constrained_node_allocation_balancer,
-)
+from constrained_node_allocation_balancer import constrained_node_allocation_balancer
 from node import Node
 
 tree = Node(
@@ -42,6 +39,5 @@ tree = Node(
         ),
     ],
 )
-_set_root_allotment(tree)
 constrained_node_allocation_balancer(tree, show=False)
 tree.show()

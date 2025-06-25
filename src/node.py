@@ -17,7 +17,7 @@ class Node:
     children: list[Node] = dataclasses.field(default_factory=list)
     parent: Node | None = dataclasses.field(default=None, repr=False)
     level: int = dataclasses.field(init=False, repr=False)
-    allotment: float = 0.0
+    allocation: float = 0.0
 
     def __post_init__(self):
         for child in self.children:
@@ -45,15 +45,15 @@ class Node:
 
     @property
     def remaining_budget(self) -> float | None:
-        return self.limit - self.allotment
+        return self.limit - self.allocation
 
     @property
     def limit_exceeded(self) -> bool:
-        return self.allotment > self.limit
+        return self.allocation > self.limit
 
     @property
     def has_headroom(self) -> bool:
-        return self.allotment < self.limit
+        return self.allocation < self.limit
 
     @property
     def nodes_by_level(self) -> dict[int, list[Node]]:
@@ -93,8 +93,8 @@ class Node:
         return len(self.all_leaves)
 
     @property
-    def all_leaf_allotments(self) -> dict[str, float]:
-        return {leaf.id: leaf.allotment for leaf in self.all_leaves}
+    def all_leaf_allocations(self) -> dict[str, float]:
+        return {leaf.id: leaf.allocation for leaf in self.all_leaves}
 
     @property
     def ancestor_chain(self) -> list[Node]:
@@ -120,8 +120,8 @@ class Node:
         all_nodes = self.all_nodes
         max_id_suffix_len = max(len(n._id_suffix) for n in all_nodes)
         max_depth = max(n.level for n in all_nodes)
-        max_allotment = max(n.allotment for n in all_nodes)
-        max_allotment_str_len = len(f"{max_allotment:.3f}")
+        max_allocation = max(n.allocation for n in all_nodes)
+        max_allocation_str_len = len(f"{max_allocation:.3f}")
         max_limit = max(n.limit for n in all_nodes if n.limit is not None)
         max_limit_str_len = len(f"{max_limit:.3f}")
         for node in all_nodes:
@@ -130,7 +130,7 @@ class Node:
                 tag=node._tree_repr(
                     max_id_suffix_len,
                     max_depth,
-                    max_allotment_str_len,
+                    max_allocation_str_len,
                     max_limit_str_len,
                     max_limit,
                 ),
@@ -142,7 +142,7 @@ class Node:
         self,
         max_id_suffix_len: int,
         max_depth: int,
-        max_allotment_str_len: int,
+        max_allocation_str_len: int,
         max_limit_str_len: int,
         max_limit: float,
         indent_per_level: int = 4,
@@ -157,13 +157,13 @@ class Node:
             + " "
             + " " * indent_per_level * (max_depth - self.level)
             + " "
-            + f"{pad(f'{self.allotment:.3f}', max_allotment_str_len)}"
+            + f"{pad(f'{self.allocation:.3f}', max_allocation_str_len)}"
         )
         if not math.isinf(self.limit):
             repr += f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
             if max_limit != 0:
                 barplot = make_ascii_barplot(
-                    value=self.allotment,
+                    value=self.allocation,
                     max_value=self.limit,
                     width=int(self.limit / max_limit * max_bar_width),
                 )

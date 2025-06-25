@@ -35,7 +35,7 @@ def test_on_one_level_tree() -> None:
     # When:
     constrained_node_allocation_balancer(root)
     # Then:
-    assert root.all_leaf_allotments == {"1": 1}
+    assert root.all_leaf_allocations == {"1": 1}
 
 
 class TestOnTwoLevelTree:
@@ -54,9 +54,9 @@ class TestOnTwoLevelTree:
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 3
+        assert root.allocation == 3
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1": 2,
             "1|2": 1,
         }
@@ -72,9 +72,9 @@ class TestOnTwoLevelTree:
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 2
+        assert root.allocation == 2
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1": 1,
             "1|2": 1,
         }
@@ -90,9 +90,9 @@ class TestOnTwoLevelTree:
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 2
+        assert root.allocation == 2
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1": 1,
             "1|2": 1,
         }
@@ -102,25 +102,25 @@ class TestOnTwoLevelTree:
         root = Node(
             limit=15,
             children=[
-                # These nodes' allotment will start at root.allotment / 3 nodes = 5 units each.
+                # These nodes' allocation will start at root.allocation / 3 nodes = 5 units each.
                 Node(limit=6),
-                # ^ Node 1|1's initial allotment does NOT exceed its limit.
+                # ^ Node 1|1's initial allocation does NOT exceed its limit.
                 Node(limit=1),
-                # ^ Node 1|2's initial allotment DOES exceed its limit, by 4 units.
+                # ^ Node 1|2's initial allocation DOES exceed its limit, by 4 units.
                 #     This excess will be redistributed among the node's neighbors that have
                 #     headroom, allocating 2 more units to each of nodes 1|1 and 1|3.
-                #     As a result, node 1|1's allotment will end up exceeding its limit by 1 unit.
+                #     As a result, node 1|1's allocation will end up exceeding its limit by 1 unit.
                 #     This excess will be redistributed among node 1|1's remaining neighbors that
                 #     have headroom (in this case, only node 1|3).
                 Node(limit=9),
-                # ^ Node 1|3's initial allotment does NOT exceed its limit (node has headroom).
+                # ^ Node 1|3's initial allocation does NOT exceed its limit (node has headroom).
             ],
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 15
+        assert root.allocation == 15
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1": 6,
             "1|2": 1,
             "1|3": 8,
@@ -151,9 +151,9 @@ class TestOnThreeLevelTree:
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 4
+        assert root.allocation == 4
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1": 1,
             "1|2|1": 1,
             "1|3|1": 1,
@@ -180,9 +180,9 @@ class TestOnThreeLevelTree:
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 10
+        assert root.allocation == 10
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1": 1,
             "1|2|1": 2,
             "1|3|1": 3,
@@ -207,9 +207,9 @@ class TestOnThreeLevelTree:
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 90
+        assert root.allocation == 90
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1|1": 10,
             "1|2|1": 80,  # Would be `70` without `_adjust_inactive_limits`.
         }
@@ -243,9 +243,9 @@ class TestOnFourLevelTree:
         )
         # When:
         constrained_node_allocation_balancer(root)
-        assert root.allotment == 89
+        assert root.allocation == 89
         # Then:
-        assert root.all_leaf_allotments == {
+        assert root.all_leaf_allocations == {
             "1|1|1|1": 1,
             "1|1|2|1": 8,
             "1|2|1": 80,  # Would be `70` without `_adjust_inactive_limits`.
