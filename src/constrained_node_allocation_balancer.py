@@ -1,3 +1,5 @@
+import math
+
 from node import Node
 
 
@@ -8,11 +10,14 @@ def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
 
 
 def _set_root_allotment(tree: Node) -> None:
+    for node in tree.all_nodes:
+        if node.allotment != 0.0:
+            raise ValueError("All node allotments must start at 0.0.")
     for leaf in tree.all_leaves:
         ancestral_budgets = [
             n.remaining_budget
             for n in [leaf, *leaf.ancestor_chain]
-            if n.limit is not None
+            if not math.isinf(n.limit)
         ]
         if len(ancestral_budgets) == 0:
             raise AncestorChainWithoutLimitError
@@ -20,24 +25,22 @@ def _set_root_allotment(tree: Node) -> None:
         for a in leaf.ancestor_chain:
             a.allotment += leaf.allotment
     for descendant in tree.all_descendants:
-        if descendant is not tree:
-            descendant.allotment = 0.0
+        descendant.allotment = 0.0
 
 
 def _adjust_inactive_constraints(tree: Node) -> None:
     for level_nodes in reversed(tree.nodes_by_level.values()):  # Root first.
         for node in level_nodes:
+            children_throughput = sum(n.limit for n in node.children)
             if len(node.children) > 0 and (
-                node.limit is None or sum(n.limit for n in node.children) <= node.limit
+                math.isinf(node.limit) or children_throughput <= node.limit
             ):
                 # The node has no limit, or the node's limit can never be reached due to its
                 #     children's limits. Set the node's limit to the sum of its children's limits:
-                node.limit = sum(n.limit for n in node.children)
+                node.limit = children_throughput
 
 
 def _balance_allocations(tree: Node, show: bool = True) -> None:
-    assert tree.allotment is not None
-
     def echo():
         if show:
             tree.show()

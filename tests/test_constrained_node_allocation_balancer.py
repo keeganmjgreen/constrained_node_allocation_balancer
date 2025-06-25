@@ -9,18 +9,21 @@ from node import Node
 
 def test_raising_if_any_branches_without_limit() -> None:
     with pytest.raises(AncestorChainWithoutLimitError):
-        constrained_node_allocation_balancer(Node(limit=None))
+        constrained_node_allocation_balancer(Node(limit=float("inf")))
     with pytest.raises(AncestorChainWithoutLimitError):
         constrained_node_allocation_balancer(
-            Node(limit=None, children=[Node(limit=1), Node(limit=None)])
+            Node(limit=float("inf"), children=[Node(limit=1), Node(limit=float("inf"))])
         )
     with pytest.raises(AncestorChainWithoutLimitError):
         constrained_node_allocation_balancer(
             Node(
-                limit=None,
+                limit=float("inf"),
                 children=[
                     Node(limit=1),
-                    Node(limit=None, children=[Node(limit=1), Node(limit=None)]),
+                    Node(
+                        limit=float("inf"),
+                        children=[Node(limit=1), Node(limit=float("inf"))],
+                    ),
                 ],
             )
         )
@@ -36,9 +39,10 @@ def test_on_one_level_tree() -> None:
 
 
 class TestOnTwoLevelTree:
-    @pytest.mark.parametrize("root_limit", [None, 3])
+
+    @pytest.mark.parametrize("root_limit", [float("inf"), 3])
     def test_allocating_to_leaves_without_limiting_parent(
-        self, root_limit: float | None
+        self, root_limit: float
     ) -> None:
         # Given:
         root = Node(
@@ -54,6 +58,24 @@ class TestOnTwoLevelTree:
         # Then:
         assert root.all_leaf_allotments == {
             "1|1": 2,
+            "1|2": 1,
+        }
+
+    def test_allocating_to_leaves_without_limits(self) -> None:
+        # Given:
+        root = Node(
+            limit=2,
+            children=[
+                Node(limit=float("inf")),
+                Node(limit=float("inf")),
+            ],
+        )
+        # When:
+        constrained_node_allocation_balancer(root)
+        assert root.allotment == 2
+        # Then:
+        assert root.all_leaf_allotments == {
+            "1|1": 1,
             "1|2": 1,
         }
 
