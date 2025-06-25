@@ -1,0 +1,21 @@
+site_name: Constrained Node Allocation Balancer
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - The Algorithm: algorithm.md
+  - Test Suite: test_suite.md
+theme:
+  name: material
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - smarty
