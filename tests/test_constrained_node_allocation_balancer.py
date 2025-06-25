@@ -160,6 +160,35 @@ class TestOnThreeLevelTree:
             "1|3|2": 1,
         }
 
+    def test_reallocating_to_leaves_in_proportion_to_n_leaves_at_or_below(self) -> None:
+        # Given:
+        root = Node(
+            children=[
+                Node(limit=1),
+                Node(
+                    children=[
+                        Node(limit=2),
+                    ]
+                ),
+                Node(
+                    children=[
+                        Node(limit=3),
+                        Node(limit=4),
+                    ]
+                ),
+            ],
+        )
+        # When:
+        constrained_node_allocation_balancer(root)
+        assert root.allotment == 10
+        # Then:
+        assert root.all_leaf_allotments == {
+            "1|1": 1,
+            "1|2|1": 2,
+            "1|3|1": 3,
+            "1|3|2": 4,
+        }
+
     def test_allocating_to_leaves_when_adjusting_inactive_constraint_is_necessary(
         self,
     ) -> None:
