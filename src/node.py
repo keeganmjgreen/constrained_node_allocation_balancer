@@ -106,14 +106,14 @@ class Node:
         return ancestor_chain
 
     @property
-    def neighbors(self) -> list[Node] | None:
+    def siblings(self) -> list[Node] | None:
         if self.parent is not None:
             return [n for n in self.parent.nodes_by_level[self.level] if n is not self]
 
     @property
-    def neighbors_with_headroom(self) -> list[Node] | None:
+    def siblings_with_headroom(self) -> list[Node] | None:
         if self.parent is not None:
-            return [n for n in self.neighbors if n.has_headroom]
+            return [n for n in self.siblings if n.has_headroom]
 
     def show(self) -> None:
         tree = Tree()

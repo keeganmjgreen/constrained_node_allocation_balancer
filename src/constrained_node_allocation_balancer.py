@@ -52,15 +52,15 @@ def _balance_allocations(tree: Node, show: bool = True) -> None:
             for node in level_nodes:
                 if node.limit_exceeded:
                     excess = node.allocation - node.limit
-                    neighbors_with_headroom = node.neighbors_with_headroom
-                    for neighbor in neighbors_with_headroom:
-                        neighbor.allocation += (
+                    siblings_with_headroom = node.siblings_with_headroom
+                    for sibling in siblings_with_headroom:
+                        sibling.allocation += (
                             excess
                             / sum(
-                                neighbor.n_leaves_at_or_below
-                                for neighbor in neighbors_with_headroom
+                                sibling.n_leaves_at_or_below
+                                for sibling in siblings_with_headroom
                             )
-                            * neighbor.n_leaves_at_or_below
+                            * sibling.n_leaves_at_or_below
                         )
                     node.allocation -= excess
                     echo()

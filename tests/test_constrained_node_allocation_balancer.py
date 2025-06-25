@@ -129,6 +129,39 @@ class TestOnTwoLevelTree:
 
 class TestOnThreeLevelTree:
 
+    def test_allocating_to_leaves_when_redistribution_is_necessary(self) -> None:
+        """This would fail if `.siblings` were replaced with `.neighbors`
+        (siblings, cousins, and so on).
+        """
+        # Given:
+        root = Node(
+            children=[
+                Node(
+                    children=[
+                        Node(limit=1),
+                        Node(limit=2),
+                    ],
+                ),
+                Node(
+                    limit=2,
+                    children=[
+                        Node(limit=1),
+                        Node(limit=2),
+                    ],
+                ),
+            ],
+        )
+        # When:
+        constrained_node_allocation_balancer(root)
+        assert root.allocation == 5
+        # Then:
+        assert root.all_leaf_allocations == {
+            "1|1|1": 1,  # Would be `1.00` with `.neighbors` instead of `.siblings`.
+            "1|1|2": 2,  # Would be `1.75` with `.neighbors` instead of `.siblings`.
+            "1|2|1": 1,  # Would be `1.00` with `.neighbors` instead of `.siblings`.
+            "1|2|2": 1,  # Would be `1.25` with `.neighbors` instead of `.siblings`.
+        }
+
     def test_allocating_to_leaves_in_proportion_to_n_leaves_at_or_below(self) -> None:
         """Test balancing allocation among leaves regardless of depth."""
         # Given:
@@ -216,7 +249,8 @@ class TestOnThreeLevelTree:
 
 
 class TestOnFourLevelTree:
-    def test_allocating_to_leaves_when_adjusting_inactive_limit_is_necessary(
+
+    def test_allocating_to_leaves_when_adjusting_inactive_limits_is_necessary(
         self,
     ) -> None:
         # Given:
