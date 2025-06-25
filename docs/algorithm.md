@@ -3,7 +3,7 @@
 The Constrained Node Allocation Balancer algorithm can be broken down into three steps:
 
 - Determining the root allotment.
-- Adjusting inactive constraints.
+- Adjusting inactive limits.
 - Balancing the descendant nodes' allotments.
 
 Each of these steps corresponds to an internal function called by `constrained_node_allocation_balancer`.
@@ -19,11 +19,11 @@ The algorithm's first step is determining the allotment of the tree's root node.
     The root allotment will be the same regardless of the order in which the leaves are iterated over, even if the leaf allotments would in general be different. In other words, every `Node.children: list[Node]` can be reordered arbitrarily without consequence.
 
 
-## Step 2: Adjusting inactive constraints
+## Step 2: Adjusting inactive limits
 
-*Function `_adjust_inactive_constraints`.*
+*Function `_adjust_inactive_limits`.*
 
-The tree may have nodes without limits or nodes whose limits can never be reached due to the limits of those nodes's children. Such nodes will be referred to as inactive nodes because they represent inactive constraints; they do not end up limiting their own allotment or that of their children. Inactive nodes TODO
+The tree may have nodes without limits or nodes whose limits can never be reached due to the limits of those nodes's children. Such nodes will be referred to as inactive nodes because they represent inactive limits; they do not end up limiting their own allotment or that of their children. Inactive nodes TODO
 
 The algorithm's second step is adjusting the limits of any inactive nodes.
 

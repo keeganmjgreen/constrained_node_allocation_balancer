@@ -5,7 +5,7 @@ from node import Node
 
 def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
     _set_root_allotment(tree)
-    _adjust_inactive_constraints(tree)
+    _adjust_inactive_limits(tree)
     _balance_allocations(tree, show)
 
 
@@ -28,7 +28,7 @@ def _set_root_allotment(tree: Node) -> None:
         descendant.allotment = 0.0
 
 
-def _adjust_inactive_constraints(tree: Node) -> None:
+def _adjust_inactive_limits(tree: Node) -> None:
     for level_nodes in reversed(tree.nodes_by_level.values()):  # Root first.
         for node in level_nodes:
             children_throughput = sum(n.limit for n in node.children)

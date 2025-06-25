@@ -189,18 +189,18 @@ class TestOnThreeLevelTree:
             "1|3|2": 4,
         }
 
-    def test_allocating_to_leaves_when_adjusting_inactive_constraint_is_necessary(
+    def test_allocating_to_leaves_when_adjusting_inactive_limit_is_necessary(
         self,
     ) -> None:
         # Given:
         root = Node(
             children=[
                 Node(
-                    limit=2,  # Inactive constraint; will be adjusted to `1`.
+                    limit=2,  # Inactive limit; will be adjusted to `1`.
                     children=[Node(limit=1)],
                 ),
                 Node(
-                    limit=9,  # Active constraint.
+                    limit=9,  # Active limit.
                     children=[Node(limit=10)],
                 ),
             ],
@@ -211,5 +211,5 @@ class TestOnThreeLevelTree:
         # Then:
         assert root.all_leaf_allotments == {
             "1|1|1": 1,
-            "1|2|1": 9,  # Would be `8` without `_adjust_inactive_constraints`.
+            "1|2|1": 9,  # Would be `8` without `_adjust_inactive_limits`.
         }
