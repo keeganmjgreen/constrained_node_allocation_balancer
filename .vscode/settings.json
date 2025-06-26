@@ -20,6 +20,5 @@
     "python.testing.unittestEnabled": false,
     "cSpell.words": [
         "barplot",
-        "treelib"
     ],
 }

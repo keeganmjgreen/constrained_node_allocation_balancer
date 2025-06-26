@@ -3,10 +3,9 @@ from __future__ import annotations
 import dataclasses
 import math
 from itertools import groupby
-from typing import Literal
+from typing import Any, Literal
 
 import python_to_mermaid
-import treelib
 
 from ascii_barplot import make_ascii_barplot, make_ascii_barplot_with_marker
 
@@ -120,6 +119,11 @@ class Node:
     def show(
         self, max_value: float | None, how: Literal["ascii", "mermaid"] = "ascii"
     ) -> None:
+        print(self.tree_repr(max_value, how))
+
+    def tree_repr(
+        self, max_value: float | None, how: Literal["ascii", "mermaid"] = "ascii"
+    ) -> str:
         all_nodes = self.all_nodes
         max_id_suffix_len = max(len(n._id_suffix) for n in all_nodes)
         max_depth = max(n.level for n in all_nodes)
@@ -131,20 +135,13 @@ class Node:
             max_value = max(max_allocation, max_limit)
 
         if how == "ascii":
-            tree = treelib.Tree()
-            for node in all_nodes:
-                tree.create_node(
-                    identifier=node.id,
-                    tag=node._node_repr(
-                        max_id_suffix_len,
-                        max_depth,
-                        max_allocation_str_len,
-                        max_limit_str_len,
-                        max_value,
-                    ),
-                    parent=(node.parent.id if node.parent else None),
-                )
-            tree.show()
+            return self._tree_repr(
+                max_id_suffix_len=max_id_suffix_len,
+                max_depth=max_depth,
+                max_allocation_str_len=max_allocation_str_len,
+                max_limit_str_len=max_limit_str_len,
+                max_value=max_value,
+            )
         elif how == "mermaid":
             diagram = python_to_mermaid.MermaidDiagram()
             for node in all_nodes:
@@ -160,9 +157,35 @@ class Node:
                 )
                 if node.parent is not None:
                     diagram.add_edge(node.parent.id, node.id)
-            print(str(diagram))
+            return str(diagram)
         else:
             raise NotImplementedError
+
+    def _tree_repr(
+        self,
+        root: bool = True,
+        header: str = "",
+        last: bool = True,
+        **node_repr_kwargs: dict[str, Any],
+    ) -> str:
+        elbow = "└───"
+        pipe = "│   "
+        tee = "├───"
+        blank = "    "
+        text = (
+            header
+            + ("" if root else elbow if last else tee)
+            + self._node_repr(**node_repr_kwargs)
+            + "\n"
+        )
+        for i, child in enumerate(self.children):
+            text += child._tree_repr(
+                root=False,
+                header=(header + ("" if root else blank if last else pipe)),
+                last=(i == len(self.children) - 1),
+                **node_repr_kwargs,
+            )
+        return text
 
     def _node_repr(
         self,
