@@ -6,7 +6,7 @@ from itertools import groupby
 
 from treelib import Tree
 
-from ascii_barplot import make_ascii_barplot
+from ascii_barplot import make_ascii_barplot, make_ascii_barplot_with_marker
 
 
 @dataclasses.dataclass
@@ -115,7 +115,7 @@ class Node:
         if self.parent is not None:
             return [n for n in self.siblings if n.has_headroom]
 
-    def show(self) -> None:
+    def show(self, max_value: float | None) -> None:
         tree = Tree()
         all_nodes = self.all_nodes
         max_id_suffix_len = max(len(n._id_suffix) for n in all_nodes)
@@ -124,6 +124,8 @@ class Node:
         max_allocation_str_len = len(f"{max_allocation:.3f}")
         max_limit = max(n.limit for n in all_nodes if not math.isinf(n.limit))
         max_limit_str_len = len(f"{max_limit:.3f}")
+        if max_value is None:
+            max_value = max(max_allocation, max_limit)
         for node in all_nodes:
             tree.create_node(
                 identifier=node.id,
@@ -132,7 +134,7 @@ class Node:
                     max_depth,
                     max_allocation_str_len,
                     max_limit_str_len,
-                    max_limit,
+                    max_value,
                 ),
                 parent=(node.parent.id if node.parent else None),
             )
@@ -144,7 +146,7 @@ class Node:
         max_depth: int,
         max_allocation_str_len: int,
         max_limit_str_len: int,
-        max_limit: float,
+        max_value: float,
         indent_per_level: int = 4,
         max_bar_width: int = 50,
     ) -> str:
@@ -159,20 +161,20 @@ class Node:
             + " "
             + f"{pad(f'{self.allocation:.3f}', max_allocation_str_len)}"
         )
-        if not math.isinf(self.limit):
-            repr += f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
-            barplot = make_ascii_barplot(
-                value=self.allocation,
-                max_value=self.limit,
-                width=int(self.limit / max_limit * max_bar_width),
-            )
-            repr += f"|{barplot}|"
-        else:
+        if math.isinf(self.limit):
             repr += " " * (4 + max_limit_str_len)
             barplot = make_ascii_barplot(
                 value=self.allocation,
-                max_value=max_limit,
+                max_value=max_value,
                 width=max_bar_width,
             )
-            repr += f"|{barplot}"
+        else:
+            repr += f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
+            barplot = make_ascii_barplot_with_marker(
+                value=self.allocation,
+                marker=self.limit,
+                max_value=max_value,
+                width=max_bar_width,
+            )
+        repr += f"|{barplot}"
         return repr

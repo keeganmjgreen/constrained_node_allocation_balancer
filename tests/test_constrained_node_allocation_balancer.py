@@ -2,6 +2,7 @@ import pytest
 
 from constrained_node_allocation_balancer import (
     AncestorChainWithoutLimitError,
+    Logs,
     constrained_node_allocation_balancer,
 )
 from node import Node
@@ -53,8 +54,9 @@ class TestOnTwoLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 3
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1": 2,
@@ -71,8 +73,9 @@ class TestOnTwoLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 2
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1": 1,
@@ -89,8 +92,9 @@ class TestOnTwoLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 2
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1": 1,
@@ -117,8 +121,9 @@ class TestOnTwoLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 15
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1": 6,
@@ -152,8 +157,9 @@ class TestOnThreeLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 5
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1|1": 1,  # Would be `1.00` with `.neighbors` instead of `.siblings`.
@@ -183,8 +189,9 @@ class TestOnThreeLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 4
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1": 1,
@@ -212,8 +219,9 @@ class TestOnThreeLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 10
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1": 1,
@@ -239,8 +247,9 @@ class TestOnThreeLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 90
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1|1": 10,
@@ -276,8 +285,9 @@ class TestOnFourLevelTree:
             ],
         )
         # When:
-        logs = constrained_node_allocation_balancer(root, return_logs=True)
+        logs: Logs = constrained_node_allocation_balancer(root, return_logs=True)
         assert root.allocation == 89
+        logs.show()
         # Then:
         assert root.all_leaf_allocations == {
             "1|1|1|1": 1,

@@ -5,12 +5,40 @@ from typing import Callable
 from node import Node
 
 
+class Logs:
+    _tree_snapshots: dict[str, Node]
+
+    def __init__(self) -> None:
+        self._tree_snapshots = {}
+
+    def add(self, message: str, tree: Node) -> None:
+        self._tree_snapshots[message] = deepcopy(tree)
+
+    def show(self) -> None:
+        max_value = max(
+            max(
+                n.allocation
+                for tree in self._tree_snapshots.values()
+                for n in tree.all_nodes
+            ),
+            max(
+                n.limit
+                for tree in self._tree_snapshots.values()
+                for n in tree.all_nodes
+                if not math.isinf(n.limit)
+            ),
+        )
+        for message, tree in self._tree_snapshots.items():
+            print(message)
+            tree.show(max_value=max_value)
+
+
 def constrained_node_allocation_balancer(tree: Node, return_logs: bool = False) -> None:
-    logs: dict[str, Node] = {}
+    logs = Logs()
 
     def logger(message: str, tree: Node):
         if return_logs:
-            logs[message] = deepcopy(tree)
+            logs.add(message, tree)
 
     _set_root_allocation(tree, logger)
     _adjust_inactive_limits(tree, logger)
@@ -42,7 +70,9 @@ def _set_root_allocation(tree: Node, logger: Callable) -> None:
 
 
 def _adjust_inactive_limits(tree: Node, logger: Callable) -> None:
-    for level_nodes in reversed(tree.nodes_by_level.values()):  # Root last.
+    for level, level_nodes in reversed(tree.nodes_by_level.items()):  # Root last.
+        if level == 0:
+            continue
         for node in level_nodes:
             children_throughput = sum(n.limit for n in node.children)
             if len(node.children) > 0 and (

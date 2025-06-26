@@ -1,4 +1,7 @@
-from constrained_node_allocation_balancer import constrained_node_allocation_balancer
+from constrained_node_allocation_balancer import (
+    Logs,
+    constrained_node_allocation_balancer,
+)
 from node import Node
 
 tree = Node(
@@ -39,5 +42,5 @@ tree = Node(
         ),
     ],
 )
-constrained_node_allocation_balancer(tree, show=False)
-tree.show()
+logs: Logs = constrained_node_allocation_balancer(tree, return_logs=True)
+logs.show()
