@@ -122,7 +122,7 @@ class Node:
         max_depth = max(n.level for n in all_nodes)
         max_allocation = max(n.allocation for n in all_nodes)
         max_allocation_str_len = len(f"{max_allocation:.3f}")
-        max_limit = max(n.limit for n in all_nodes if n.limit is not None)
+        max_limit = max(n.limit for n in all_nodes if not math.isinf(n.limit))
         max_limit_str_len = len(f"{max_limit:.3f}")
         for node in all_nodes:
             tree.create_node(
@@ -161,11 +161,10 @@ class Node:
         )
         if not math.isinf(self.limit):
             repr += f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
-            if max_limit != 0:
-                barplot = make_ascii_barplot(
-                    value=self.allocation,
-                    max_value=self.limit,
-                    width=int(self.limit / max_limit * max_bar_width),
-                )
-                repr += f"|{barplot}|"
+            barplot = make_ascii_barplot(
+                value=self.allocation,
+                max_value=self.limit,
+                width=int(self.limit / max_limit * max_bar_width),
+            )
+            repr += f"|{barplot}|"
             return repr
