@@ -129,7 +129,7 @@ class Node:
         for node in all_nodes:
             tree.create_node(
                 identifier=node.id,
-                tag=node._tree_repr(
+                tag=node._node_repr(
                     max_id_suffix_len,
                     max_depth,
                     max_allocation_str_len,
@@ -140,7 +140,7 @@ class Node:
             )
         tree.show()
 
-    def _tree_repr(
+    def _node_repr(
         self,
         max_id_suffix_len: int,
         max_depth: int,
