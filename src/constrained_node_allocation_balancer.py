@@ -1,5 +1,6 @@
 import math
 from copy import deepcopy
+from pathlib import Path
 from typing import Callable, Literal
 
 from node import Node
@@ -15,7 +16,27 @@ class Logs:
         self._tree_snapshots[message] = deepcopy(tree)
 
     def show(self, how: Literal["ascii", "mermaid"] = "ascii") -> None:
-        max_value = max(
+        for message, tree in self._tree_snapshots.items():
+            print(message)
+            tree.show(max_value=self._max_value, how=how)
+
+    def write(
+        self, file: Path | str, how: Literal["ascii", "mermaid"] = "ascii"
+    ) -> None:
+        file = Path(file)
+        with file.open(mode="w") as f:
+            for message, tree in self._tree_snapshots.items():
+                f.write(message + "\n")
+                f.write("\n")
+                f.write(f"```{'mermaid' if how == 'mermaid' else ''}\n")
+                f.write(tree.tree_repr(max_value=self._max_value, how=how))
+                f.write("\n")
+                f.write("```\n")
+                f.write("\n")
+
+    @property
+    def _max_value(self) -> float:
+        return max(
             max(
                 n.allocation
                 for tree in self._tree_snapshots.values()
@@ -28,9 +49,6 @@ class Logs:
                 if not math.isinf(n.limit)
             ),
         )
-        for message, tree in self._tree_snapshots.items():
-            print(message)
-            tree.show(max_value=max_value, how=how)
 
 
 def constrained_node_allocation_balancer(tree: Node, return_logs: bool = False) -> None:

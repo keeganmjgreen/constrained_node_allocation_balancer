@@ -29,7 +29,7 @@ class Node:
             self._set_levels()
 
     def _set_ids(
-        self, starting_at: str = "1", parent_id: str | None = None, separator: str = "|"
+        self, starting_at: str = "1", parent_id: str | None = None, separator: str = "."
     ) -> None:
         self._id_suffix = starting_at
         if self.parent is None:
@@ -173,10 +173,10 @@ class Node:
         tee = "├───"
         blank = "    "
         text = (
-            header
+            ("" if root else "\n")
+            + header
             + ("" if root else elbow if last else tee)
             + self._node_repr(**node_repr_kwargs)
-            + "\n"
         )
         for i, child in enumerate(self.children):
             text += child._tree_repr(
