@@ -93,6 +93,21 @@ tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "python-to-mermaid"
+version = "0.6.0"
+description = "Generate Mermaid diagrams using Python code"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "python_to_mermaid-0.6.0-py3-none-any.whl", hash = "sha256:ee5c7b2c5a92272f639feaad02107e50789cad0ba77809bf46202fd0905fdfe7"},
+    {file = "python_to_mermaid-0.6.0.tar.gz", hash = "sha256:2f0d7117d22e865a41cb876defbe1561a25d73d719771066940d1fc3fd93fe73"},
+]
+
+[package.dependencies]
+pytest = ">=7.4.4"
+
+[[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -165,4 +180,4 @@ six = "*"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.8"
-content-hash = "538d7ab42503d75976238884747e0714f003cddf1af5908971a27ed68d2aec2b"
+content-hash = "dfe0d0abfa098c8fd5c6ad5aaca900e6f57cede5e53f49101a31e05a08cfb45e"

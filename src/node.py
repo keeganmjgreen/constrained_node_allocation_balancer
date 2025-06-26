@@ -3,8 +3,10 @@ from __future__ import annotations
 import dataclasses
 import math
 from itertools import groupby
+from typing import Literal
 
-from treelib import Tree
+import python_to_mermaid
+import treelib
 
 from ascii_barplot import make_ascii_barplot, make_ascii_barplot_with_marker
 
@@ -115,8 +117,9 @@ class Node:
         if self.parent is not None:
             return [n for n in self.siblings if n.has_headroom]
 
-    def show(self, max_value: float | None) -> None:
-        tree = Tree()
+    def show(
+        self, max_value: float | None, how: Literal["ascii", "mermaid"] = "ascii"
+    ) -> None:
         all_nodes = self.all_nodes
         max_id_suffix_len = max(len(n._id_suffix) for n in all_nodes)
         max_depth = max(n.level for n in all_nodes)
@@ -126,19 +129,40 @@ class Node:
         max_limit_str_len = len(f"{max_limit:.3f}")
         if max_value is None:
             max_value = max(max_allocation, max_limit)
-        for node in all_nodes:
-            tree.create_node(
-                identifier=node.id,
-                tag=node._node_repr(
-                    max_id_suffix_len,
-                    max_depth,
-                    max_allocation_str_len,
-                    max_limit_str_len,
-                    max_value,
-                ),
-                parent=(node.parent.id if node.parent else None),
-            )
-        tree.show()
+
+        if how == "ascii":
+            tree = treelib.Tree()
+            for node in all_nodes:
+                tree.create_node(
+                    identifier=node.id,
+                    tag=node._node_repr(
+                        max_id_suffix_len,
+                        max_depth,
+                        max_allocation_str_len,
+                        max_limit_str_len,
+                        max_value,
+                    ),
+                    parent=(node.parent.id if node.parent else None),
+                )
+            tree.show()
+        elif how == "mermaid":
+            diagram = python_to_mermaid.MermaidDiagram()
+            for node in all_nodes:
+                diagram.add_node(
+                    node.id,
+                    label=node._node_repr(
+                        max_id_suffix_len,
+                        max_depth,
+                        max_allocation_str_len,
+                        max_limit_str_len,
+                        max_value,
+                    ),
+                )
+                if node.parent is not None:
+                    diagram.add_edge(node.parent.id, node.id)
+            print(str(diagram))
+        else:
+            raise NotImplementedError
 
     def _node_repr(
         self,

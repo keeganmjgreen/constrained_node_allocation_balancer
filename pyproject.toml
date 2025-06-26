@@ -2,7 +2,7 @@
 name = "constrained_node_allocation_balancer"
 version = "1.0.0"
 requires-python = ">=3.8"
-dependencies = ["treelib<2", "pytest (>=8.3.5,<9.0.0)"]
+dependencies = ["treelib<2", "pytest (>=8.3.5,<9.0.0)", "python-to-mermaid (>=0.6.0,<0.7.0)"]
 
 [tool.pytest.ini_options]
 pythonpath = "src"
