@@ -167,4 +167,12 @@ class Node:
                 width=int(self.limit / max_limit * max_bar_width),
             )
             repr += f"|{barplot}|"
-            return repr
+        else:
+            repr += " " * (4 + max_limit_str_len)
+            barplot = make_ascii_barplot(
+                value=self.allocation,
+                max_value=max_limit,
+                width=max_bar_width,
+            )
+            repr += f"|{barplot}"
+        return repr

@@ -1,15 +1,26 @@
 import math
+from copy import deepcopy
+from typing import Callable
 
 from node import Node
 
 
-def constrained_node_allocation_balancer(tree: Node, show: bool = True) -> None:
-    _set_root_allocation(tree)
-    _adjust_inactive_limits(tree)
-    _balance_allocations(tree, show)
+def constrained_node_allocation_balancer(tree: Node, return_logs: bool = False) -> None:
+    logs: dict[str, Node] = {}
+
+    def logger(message: str, tree: Node):
+        if return_logs:
+            logs[message] = deepcopy(tree)
+
+    _set_root_allocation(tree, logger)
+    _adjust_inactive_limits(tree, logger)
+    _balance_allocations(tree, logger)
+
+    if return_logs:
+        return logs
 
 
-def _set_root_allocation(tree: Node) -> None:
+def _set_root_allocation(tree: Node, logger: Callable) -> None:
     for node in tree.all_nodes:
         if node.allocation != 0.0:
             raise ValueError("All node allocations must start at 0.0.")
@@ -24,11 +35,13 @@ def _set_root_allocation(tree: Node) -> None:
         leaf.allocation = min(ancestral_budgets)
         for a in leaf.ancestor_chain:
             a.allocation += leaf.allocation
+        logger(f"Allocated {min(ancestral_budgets) = } to leaf {leaf.id}", tree)
     for descendant in tree.all_descendants:
         descendant.allocation = 0.0
+    logger("Cleared allocations from all non-root nodes", tree)
 
 
-def _adjust_inactive_limits(tree: Node) -> None:
+def _adjust_inactive_limits(tree: Node, logger: Callable) -> None:
     for level_nodes in reversed(tree.nodes_by_level.values()):  # Root last.
         for node in level_nodes:
             children_throughput = sum(n.limit for n in node.children)
@@ -38,14 +51,14 @@ def _adjust_inactive_limits(tree: Node) -> None:
                 # The node has no limit, or the node's limit can never be reached due to its
                 #     children's limits. Set the node's limit to the sum of its children's limits:
                 node.limit = children_throughput
+                logger(
+                    f"Set limit of node {node.id} to the sum of its children's limits "
+                    f"{children_throughput}",
+                    tree,
+                )
 
 
-def _balance_allocations(tree: Node, show: bool = True) -> None:
-    def echo():
-        if show:
-            tree.show()
-
-    echo()
+def _balance_allocations(tree: Node, logger: Callable) -> None:
     for level_nodes in tree.nodes_by_level.values():
         # Redistribute nodes' allocations until all nodes' limits are respected:
         while any(node.limit_exceeded for node in level_nodes):
@@ -63,7 +76,11 @@ def _balance_allocations(tree: Node, show: bool = True) -> None:
                             * sibling.n_leaves_at_or_below
                         )
                     node.allocation -= excess
-                    echo()
+                    logger(
+                        f"Redistributed {excess} from node {node.id} to siblings with headroom "
+                        f"{[s.id for s in siblings_with_headroom]}",
+                        tree,
+                    )
         for node in level_nodes:
             for child in node.children:
                 child.allocation = (
@@ -71,7 +88,12 @@ def _balance_allocations(tree: Node, show: bool = True) -> None:
                     / node.n_leaves_at_or_below
                     * child.n_leaves_at_or_below
                 )
-        echo()
+            if len(node.children) > 0:
+                logger(
+                    f"Distributed {node.allocation} from node {node.id} to children "
+                    f"{[c.id for c in node.children]}",
+                    tree,
+                )
 
 
 class AncestorChainWithoutLimitError(Exception):
