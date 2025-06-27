@@ -234,4 +234,4 @@ class Node:
                 width=max_bar_width,
                 blank=blank,
             )
-        return f"[{barplot}]"
+        return f"|{barplot}"
