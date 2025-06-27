@@ -218,5 +218,5 @@ class Node:
                 max_value=max_value,
                 width=max_bar_width,
             )
-        repr += f"|{barplot}"
+        repr += f"[{barplot}]"
         return repr

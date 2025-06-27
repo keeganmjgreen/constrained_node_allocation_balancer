@@ -41,15 +41,17 @@ def make_ascii_barplot(
 def make_ascii_barplot_with_marker(
     value: int | float,
     marker: int | float,
-    max_value: int | float | None = None,
-    width: int | None = None,
+    max_value: int | float,
+    width: int,
     block_elements: dict[int | float, str] | None = None,
 ) -> str:
     ascii_barplot = make_ascii_barplot(value, max_value, width, block_elements)
-    if max_value is not None:
-        # Normalize to `width` using `max_value`:
-        marker = deepcopy(marker / max_value * width)
+    assert marker <= max_value
+    # Normalize to `width` using `max_value`:
+    marker = deepcopy(marker / max_value * width)
     marker_position = int(marker // 1)
+    if marker_position == width:
+        marker_position = width - 1
     ascii_barplot = (
         ascii_barplot[:marker_position] + "|" + ascii_barplot[marker_position + 1 :]
     )
