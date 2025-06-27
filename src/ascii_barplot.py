@@ -19,6 +19,7 @@ def make_ascii_barplot(
         value = deepcopy(value / max_value * width)
     if block_elements is None:
         block_elements = {
+            0: "",
             1 / 8: "▏",
             2 / 8: "▎",
             3 / 8: "▍",
