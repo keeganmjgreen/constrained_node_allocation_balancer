@@ -8,6 +8,7 @@ def make_ascii_barplot(
     max_value: int | float | None = None,
     width: int | None = None,
     block_elements: dict[int | float, str] | None = None,
+    blank: str = " ",
 ) -> str:
     if (max_value is None) is not (width is None):
         raise ValueError(
@@ -32,7 +33,7 @@ def make_ascii_barplot(
         closest_value_in_array(value % 1, list(block_elements.keys()))
     ]
     if width is not None:
-        remaining_part = (width - len(base_part) - 1) * " "
+        remaining_part = (width - len(base_part) - 1) * blank
     else:
         remaining_part = ""
     return base_part + fractional_part + remaining_part
@@ -44,8 +45,9 @@ def make_ascii_barplot_with_marker(
     max_value: int | float,
     width: int,
     block_elements: dict[int | float, str] | None = None,
+    blank: str = " ",
 ) -> str:
-    ascii_barplot = make_ascii_barplot(value, max_value, width, block_elements)
+    ascii_barplot = make_ascii_barplot(value, max_value, width, block_elements, blank)
     assert marker <= max_value
     # Normalize to `width` using `max_value`:
     marker = deepcopy(marker / max_value * width)

@@ -123,13 +123,18 @@ class Node:
         print(self.tree_repr(max_value, how))
 
     def tree_repr(
-        self, max_value: float | None, how: Literal["ascii", "mermaid"] = "ascii"
+        self,
+        max_value: float | None,
+        how: Literal["ascii", "mermaid"] = "ascii",
+        max_bar_width: int | None = None,
     ) -> str:
         all_nodes = self.all_nodes
         max_allocation = max(n.allocation for n in all_nodes)
         max_limit = max(n.limit for n in all_nodes if not math.isinf(n.limit))
         if max_value is None:
             max_value = max(max_allocation, max_limit)
+        if max_bar_width is None:
+            max_bar_width = {"ascii": 50, "mermaid": 10}[how]
 
         if how == "ascii":
             return self._tree_repr(
@@ -138,6 +143,7 @@ class Node:
                 max_allocation_str_len=len(f"{max_allocation:.3f}"),
                 max_limit_str_len=len(f"{max_limit:.3f}"),
                 max_value=max_value,
+                max_bar_width=max_bar_width,
             )
         elif how == "mermaid":
             diagram = python_to_mermaid.MermaidDiagram()
@@ -150,7 +156,7 @@ class Node:
                         + f"{node.allocation:.3f}"
                         + ("" if math.isinf(self.limit) else f" / {self.limit:.3f}")
                         + "<br>"
-                        + f"<code>{node._ascii_barplot(max_value)}</code>"
+                        + f"<code>{node._ascii_barplot(max_value, max_bar_width, blank=".")}</code>"
                     ),
                 )
                 if node.parent is not None:
@@ -203,12 +209,15 @@ class Node:
             )
         return text
 
-    def _ascii_barplot(self, max_value: float, max_bar_width: int = 10) -> str:
+    def _ascii_barplot(
+        self, max_value: float, max_bar_width: int, blank: str = " "
+    ) -> str:
         if math.isinf(self.limit):
             barplot = make_ascii_barplot(
                 value=self.allocation,
                 max_value=max_value,
                 width=max_bar_width,
+                blank=blank,
             )
         else:
             barplot = make_ascii_barplot_with_marker(
@@ -216,5 +225,6 @@ class Node:
                 marker=self.limit,
                 max_value=max_value,
                 width=max_bar_width,
+                blank=blank,
             )
         return f"[{barplot}]"
