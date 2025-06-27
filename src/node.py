@@ -118,12 +118,18 @@ class Node:
             return [n for n in self.siblings if n.has_headroom]
 
     def show(
-        self, max_value: float | None, how: Literal["ascii", "mermaid"] = "ascii"
+        self,
+        max_allocation_str_len: int,
+        max_limit_str_len: int,
+        max_value: float | None,
+        how: Literal["ascii", "mermaid"] = "ascii",
     ) -> None:
-        print(self.tree_repr(max_value, how))
+        print(self.tree_repr(max_allocation_str_len, max_limit_str_len, max_value, how))
 
     def tree_repr(
         self,
+        max_allocation_str_len: int,
+        max_limit_str_len: int,
         max_value: float | None,
         how: Literal["ascii", "mermaid"] = "ascii",
         max_bar_width: int | None = None,
@@ -140,8 +146,8 @@ class Node:
             return self._tree_repr(
                 max_id_suffix_len=max(len(n._id_suffix) for n in all_nodes),
                 max_depth=max(n.level for n in all_nodes),
-                max_allocation_str_len=len(f"{max_allocation:.3f}"),
-                max_limit_str_len=len(f"{max_limit:.3f}"),
+                max_allocation_str_len=max_allocation_str_len,
+                max_limit_str_len=max_limit_str_len,
                 max_value=max_value,
                 max_bar_width=max_bar_width,
             )
@@ -154,7 +160,7 @@ class Node:
                         f"<b>{node.id}</b>"
                         + "<br>"
                         + f"{node.allocation:.3f}"
-                        + ("" if math.isinf(self.limit) else f" / {self.limit:.3f}")
+                        + ("" if math.isinf(node.limit) else f" / {node.limit:.3f}")
                         + "<br>"
                         + f"<code>{node._ascii_barplot(max_value, max_bar_width, blank=".")}</code>"
                     ),
@@ -201,7 +207,8 @@ class Node:
                 max_id_suffix_len,
                 max_depth,
                 max_allocation_str_len,
-                max_allocation_str_len,
+                max_limit_str_len,
+                indent_per_level,
                 root=False,
                 header=(header + ("" if root else blank if last else pipe)),
                 last=(i == len(self.children) - 1),

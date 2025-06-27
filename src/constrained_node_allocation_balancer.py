@@ -18,7 +18,12 @@ class Logs:
     def show(self, how: Literal["ascii", "mermaid"] = "ascii") -> None:
         for message, tree in self._tree_snapshots.items():
             print(message)
-            tree.show(max_value=self._max_value, how=how)
+            tree.show(
+                max_allocation_str_len=self._max_allocation_str_len,
+                max_limit_str_len=self._max_limit_str_len,
+                max_value=self._max_value,
+                how=how,
+            )
 
     def write(
         self, file: Path | str, how: Literal["ascii", "mermaid"] = "ascii"
@@ -29,25 +34,45 @@ class Logs:
                 f.write(message + "\n")
                 f.write("\n")
                 f.write(f"```{'mermaid' if how == 'mermaid' else ''}\n")
-                f.write(tree.tree_repr(max_value=self._max_value, how=how))
+                f.write(
+                    tree.tree_repr(
+                        max_allocation_str_len=self._max_allocation_str_len,
+                        max_limit_str_len=self._max_limit_str_len,
+                        max_value=self._max_value,
+                        how=how,
+                    )
+                )
                 f.write("\n")
                 f.write("```\n")
                 f.write("\n")
 
     @property
     def _max_value(self) -> float:
+        return max(self._max_allocation, self._max_limit)
+
+    @property
+    def _max_allocation_str_len(self) -> int:
+        return len(f"{self._max_allocation:.3f}")
+
+    @property
+    def _max_limit_str_len(self) -> int:
+        return len(f"{self._max_limit:.3f}")
+
+    @property
+    def _max_allocation(self) -> float:
         return max(
-            max(
-                n.allocation
-                for tree in self._tree_snapshots.values()
-                for n in tree.all_nodes
-            ),
-            max(
-                n.limit
-                for tree in self._tree_snapshots.values()
-                for n in tree.all_nodes
-                if not math.isinf(n.limit)
-            ),
+            n.allocation
+            for tree in self._tree_snapshots.values()
+            for n in tree.all_nodes
+        )
+
+    @property
+    def _max_limit(self) -> float:
+        return max(
+            n.limit
+            for tree in self._tree_snapshots.values()
+            for n in tree.all_nodes
+            if not math.isinf(n.limit)
         )
 
 
