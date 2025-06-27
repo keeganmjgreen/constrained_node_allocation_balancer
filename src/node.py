@@ -127,9 +127,7 @@ class Node:
     ) -> str:
         all_nodes = self.all_nodes
         max_allocation = max(n.allocation for n in all_nodes)
-        max_allocation_str_len = len(f"{max_allocation:.3f}")
         max_limit = max(n.limit for n in all_nodes if not math.isinf(n.limit))
-        max_limit_str_len = len(f"{max_limit:.3f}")
         if max_value is None:
             max_value = max(max_allocation, max_limit)
 
@@ -137,8 +135,8 @@ class Node:
             return self._tree_repr(
                 max_id_suffix_len=max(len(n._id_suffix) for n in all_nodes),
                 max_depth=max(n.level for n in all_nodes),
-                max_allocation_str_len=max_allocation_str_len,
-                max_limit_str_len=max_limit_str_len,
+                max_allocation_str_len=len(f"{max_allocation:.3f}"),
+                max_limit_str_len=len(f"{max_limit:.3f}"),
                 max_value=max_value,
             )
         elif how == "mermaid":
@@ -147,11 +145,12 @@ class Node:
                 diagram.add_node(
                     node.id,
                     label=(
-                        node.id
-                        + " "
-                        + node._node_repr(
-                            max_allocation_str_len, max_limit_str_len, max_value
-                        )
+                        f"<b>{node.id}</b>"
+                        + "<br>"
+                        + f"{node.allocation:.3f}"
+                        + ("" if math.isinf(self.limit) else f" / {self.limit:.3f}")
+                        + "<br>"
+                        + f"<code>{node._ascii_barplot(max_value)}</code>"
                     ),
                 )
                 if node.parent is not None:
@@ -164,6 +163,8 @@ class Node:
         self,
         max_id_suffix_len: int,
         max_depth: int,
+        max_allocation_str_len: int,
+        max_limit_str_len: int,
         indent_per_level: int = 4,
         root: bool = True,
         header: str = "",
@@ -181,12 +182,20 @@ class Node:
             + pad(self._id_suffix, max_id_suffix_len)
             + " "
             + " " * indent_per_level * (max_depth - self.level)
-            + self._node_repr(**node_repr_kwargs)
+            + f"{pad(f'{self.allocation:.3f}', max_allocation_str_len)}"
+            + (
+                " " * (4 + max_limit_str_len)
+                if math.isinf(self.limit)
+                else f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
+            )
+            + self._ascii_barplot(**node_repr_kwargs)
         )
         for i, child in enumerate(self.children):
             text += child._tree_repr(
                 max_id_suffix_len,
                 max_depth,
+                max_allocation_str_len,
+                max_allocation_str_len,
                 root=False,
                 header=(header + ("" if root else blank if last else pipe)),
                 last=(i == len(self.children) - 1),
@@ -194,29 +203,18 @@ class Node:
             )
         return text
 
-    def _node_repr(
-        self,
-        max_allocation_str_len: int,
-        max_limit_str_len: int,
-        max_value: float,
-        max_bar_width: int = 50,
-    ) -> str:
-
-        repr = f"{pad(f'{self.allocation:.3f}', max_allocation_str_len)}"
+    def _ascii_barplot(self, max_value: float, max_bar_width: int = 10) -> str:
         if math.isinf(self.limit):
-            repr += " " * (4 + max_limit_str_len)
             barplot = make_ascii_barplot(
                 value=self.allocation,
                 max_value=max_value,
                 width=max_bar_width,
             )
         else:
-            repr += f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
             barplot = make_ascii_barplot_with_marker(
                 value=self.allocation,
                 marker=self.limit,
                 max_value=max_value,
                 width=max_bar_width,
             )
-        repr += f"[{barplot}]"
-        return repr
+        return f"[{barplot}]"
