@@ -3,7 +3,17 @@ nav:
   - Home: index.md
   - Getting Started: getting_started.md
   - The Algorithm: algorithm.md
-  - Test Suite: test_suite.md
+  - Examples: examples.md
+  - Full Worked Examples:
+      - Allocating to leaves: full_worked_examples/allocating_to_leaves.md
+      - Allocating to leaves without limits: full_worked_examples/allocating_to_leaves_without_limits.md
+      - Allocating to leaves without a limiting parent: full_worked_examples/allocating_to_leaves_without_limiting_parent.md
+      - Allocating to leaves when redistribution is necessary (two-level tree): full_worked_examples/allocating_to_leaves_when_redistribution_is_necessary.md
+      - Allocating to leaves when redistribution is necessary (three-level tree): full_worked_examples/allocating_to_leaves_when_redistribution_is_necessary_2.md
+      - Allocating to leaves in proportion to the number of leaves at or below: full_worked_examples/allocating_to_leaves_in_proportion_to_n_leaves_at_or_below.md
+      - Reallocating to leaves in proportion to the number of leaves at or below: full_worked_examples/reallocating_to_leaves_in_proportion_to_n_leaves_at_or_below.md
+      - Allocating to leaves when adjusting an inactive limit(s) is necessary (three-level tree): full_worked_examples/allocating_to_leaves_when_adjusting_inactive_limit_is_necessary.md
+      - Allocating to leaves when adjusting inactive limit(s) is necessary (four-level tree): full_worked_examples/allocating_to_leaves_when_adjusting_inactive_limits_is_necessary.md
 theme:
   name: material
   palette:
@@ -22,4 +32,6 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
   - smarty

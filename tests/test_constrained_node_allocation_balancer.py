@@ -111,15 +111,16 @@ class TestOnTwoLevelTree:
         root = Node(
             limit=15,
             children=[
-                # These nodes' allocation will start at root.allocation / 3 nodes = 5 units each.
+                # These nodes' allocations will start at root.allocation / 3 nodes = 5 units each.
                 Node(limit=6),
                 # ^ Node 1.1's initial allocation does NOT exceed its limit.
                 Node(limit=1),
-                # ^ Node 1.2's initial allocation DOES exceed its limit, by 4 units.
-                #     This excess will be redistributed among the node's neighbors that have
-                #     headroom, allocating 2 more units to each of nodes 1.1 and 1.3.
-                #     As a result, node 1.1's allocation will end up exceeding its limit by 1 unit.
-                #     This excess will be redistributed among node 1.1's remaining neighbors that
+                # ^ Node 1.2's initial allocation DOES exceed its limit, by 4.0 units.
+                #     This excess will be redistributed among the node's siblings that have
+                #     headroom, allocating 2.0 more units to each of nodes 1.1 and 1.3.
+                #     As a result, node 1.1's allocation will end up exceeding its limit by 1.0
+                #     unit.
+                #     This excess will be redistributed among node 1.1's remaining siblings that
                 #     have headroom (in this case, only node 1.3).
                 Node(limit=9),
                 # ^ Node 1.3's initial allocation does NOT exceed its limit (node has headroom).
