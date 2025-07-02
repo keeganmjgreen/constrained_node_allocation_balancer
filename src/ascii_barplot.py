@@ -34,7 +34,7 @@ def make_ascii_barplot(
         closest_value_in_array(value % 1, list(block_elements.keys()))
     ]
     if width is not None:
-        remaining_part = (width - len(base_part) - 1) * blank
+        remaining_part = (width - len(base_part) - len(fractional_part)) * blank
     else:
         remaining_part = ""
     return base_part + fractional_part + remaining_part
