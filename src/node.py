@@ -119,24 +119,28 @@ class Node:
 
     def show(
         self,
-        max_allocation_str_len: int,
-        max_limit_str_len: int,
-        max_value: float | None,
+        max_allocation_str_len: int | None = None,
+        max_limit_str_len: int | None = None,
+        max_value: float | None = None,
         how: Literal["ascii", "mermaid"] = "ascii",
     ) -> None:
         print(self.tree_repr(max_allocation_str_len, max_limit_str_len, max_value, how))
 
     def tree_repr(
         self,
-        max_allocation_str_len: int,
-        max_limit_str_len: int,
-        max_value: float | None,
+        max_allocation_str_len: int | None = None,
+        max_limit_str_len: int | None = None,
+        max_value: float | None = None,
         how: Literal["ascii", "mermaid"] = "ascii",
         max_bar_width: int | None = None,
     ) -> str:
         all_nodes = self.all_nodes
         max_allocation = max(n.allocation for n in all_nodes)
+        if max_allocation_str_len is None:
+            max_allocation_str_len = len(f"{max_allocation:.3f}")
         max_limit = max(n.limit for n in all_nodes if not math.isinf(n.limit))
+        if max_limit_str_len is None:
+            max_limit_str_len = len(f"{max_limit:.3f}")
         if max_value is None:
             max_value = max(max_allocation, max_limit)
         if max_bar_width is None:
