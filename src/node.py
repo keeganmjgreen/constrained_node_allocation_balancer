@@ -21,7 +21,7 @@ class Node:
     level: int = dataclasses.field(init=False, repr=False)
     allocation: float = 0.0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         for child in self.children:
             child.parent = self
         # Set IDs and levels if this is the root node:
@@ -47,7 +47,7 @@ class Node:
     # Methods comparing the node's allocation to its limit:
 
     @property
-    def remaining_budget(self) -> float | None:
+    def remaining_budget(self) -> float:
         return self.limit - self.allocation
 
     @property
@@ -63,6 +63,9 @@ class Node:
 
     @property
     def all_descendants(self) -> list[Node]:
+        """Return a list of all the node's children, those children's children, and so on, until
+        leaf nodes are reached, in depth-first order.
+        """
         descendants: list[Node] = []
         for child in self.children:
             descendants.append(child)
@@ -71,10 +74,12 @@ class Node:
 
     @property
     def all_nodes(self) -> list[Node]:
+        """Return a list of all the tree's nodes, in depth-first order."""
         return [self, *self.all_descendants]
 
     @property
     def nodes_by_level(self) -> dict[int, list[Node]]:
+        """Return a list of nodes for each level in the tree."""
         return {
             k: list(g)
             for k, g in groupby(
@@ -85,6 +90,7 @@ class Node:
 
     @property
     def siblings(self) -> list[Node] | None:
+        """If the node is not the root node, return a list of nodes sharing the same parent."""
         if self.parent is not None:
             return [n for n in self.parent.nodes_by_level[self.level] if n is not self]
 
@@ -95,6 +101,7 @@ class Node:
 
     @property
     def ancestor_chain(self) -> list[Node]:
+        """Return a list containing the node's parent, grandparent, and so on until the root node."""
         ancestor_chain: list[Node] = []
         if self.parent is not None:
             ancestor_chain.append(self.parent)
