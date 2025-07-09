@@ -29,16 +29,14 @@ class Node:
             self._set_ids()
             self._set_levels()
 
-    def _set_ids(
-        self, starting_at: str = "1", parent_id: str | None = None, separator: str = "."
-    ) -> None:
+    def _set_ids(self, starting_at: str = "1", separator: str = ".") -> None:
         self._id_suffix = starting_at
         if self.parent is None:
             self.id = self._id_suffix
         else:
-            self.id = parent_id + separator + self._id_suffix
+            self.id = self.parent.id + separator + self._id_suffix
         for i, child in enumerate(self.children):
-            child._set_ids(starting_at=str(i + 1), parent_id=self.id)
+            child._set_ids(starting_at=str(i + 1))
 
     def _set_levels(self, starting_level: int = 0) -> None:
         self.level = starting_level
