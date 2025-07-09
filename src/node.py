@@ -43,6 +43,9 @@ class Node:
         for child in self.children:
             child._set_levels(starting_level=(self.level + 1))
 
+    # ==============================================================================================
+    # Methods comparing the node's allocation to its limit:
+
     @property
     def remaining_budget(self) -> float | None:
         return self.limit - self.allocation
@@ -55,6 +58,21 @@ class Node:
     def has_headroom(self) -> bool:
         return self.allocation < self.limit
 
+    # ==============================================================================================
+    # Methods concerning the structure of the tree:
+
+    @property
+    def all_descendants(self) -> list[Node]:
+        descendants: list[Node] = []
+        for child in self.children:
+            descendants.append(child)
+            descendants += child.all_descendants
+        return descendants
+
+    @property
+    def all_nodes(self) -> list[Node]:
+        return [self, *self.all_descendants]
+
     @property
     def nodes_by_level(self) -> dict[int, list[Node]]:
         return {
@@ -66,16 +84,26 @@ class Node:
         }
 
     @property
-    def all_nodes(self) -> list[Node]:
-        return [self, *self.all_descendants]
+    def siblings(self) -> list[Node] | None:
+        if self.parent is not None:
+            return [n for n in self.parent.nodes_by_level[self.level] if n is not self]
 
     @property
-    def all_descendants(self) -> list[Node]:
-        descendants: list[Node] = []
-        for child in self.children:
-            descendants.append(child)
-            descendants += child.all_descendants
-        return descendants
+    def siblings_with_headroom(self) -> list[Node] | None:
+        if self.parent is not None:
+            return [n for n in self.siblings if n.has_headroom]
+
+    @property
+    def ancestor_chain(self) -> list[Node]:
+        ancestor_chain: list[Node] = []
+        if self.parent is not None:
+            ancestor_chain.append(self.parent)
+            if self.parent.parent is not None:
+                ancestor_chain += self.parent.ancestor_chain
+        return ancestor_chain
+
+    # ----------------------------------------------------------------------------------------------
+    # Methods concerning leaf nodes:
 
     @property
     def all_leaves(self) -> list[Node]:
@@ -96,24 +124,8 @@ class Node:
     def all_leaf_allocations(self) -> dict[str, float]:
         return {leaf.id: leaf.allocation for leaf in self.all_leaves}
 
-    @property
-    def ancestor_chain(self) -> list[Node]:
-        ancestor_chain: list[Node] = []
-        if self.parent is not None:
-            ancestor_chain.append(self.parent)
-            if self.parent.parent is not None:
-                ancestor_chain += self.parent.ancestor_chain
-        return ancestor_chain
-
-    @property
-    def siblings(self) -> list[Node] | None:
-        if self.parent is not None:
-            return [n for n in self.parent.nodes_by_level[self.level] if n is not self]
-
-    @property
-    def siblings_with_headroom(self) -> list[Node] | None:
-        if self.parent is not None:
-            return [n for n in self.siblings if n.has_headroom]
+    # ==============================================================================================
+    # Methods for tree visualization:
 
     def show(
         self,
