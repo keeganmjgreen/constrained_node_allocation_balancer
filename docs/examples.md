@@ -50,9 +50,13 @@ flowchart TD
     1 --> 1.2
 ```
 
-If the leaves had no limits, or their limits were at least the root's limit, the result would be the same as the leaves' limits happened to be inactive. [Full worked example](full_worked_examples/allocating_to_leaves_without_limits.md). Unit test: `test_allocating_to_leaves_without_limits`
+If the leaves had no limits, or their limits were at least the root's limit, the result would be the same as if the leaves' limits happened to be inactive.
 
-If the root had no limit, or its limit was at least the sum of the leaves' limits, node 1.1 would have been allocated 2.0 units. [Full worked example](full_worked_examples/allocating_to_leaves_without_limiting_parent.md). Unit test: `test_allocating_to_leaves_without_limiting_parent`
+- [Full worked example](full_worked_examples/allocating_to_leaves_without_limits.md). Unit test: `test_allocating_to_leaves_without_limits`
+
+If the root had no limit, or its limit was at least the sum of the leaves' limits, node 1.1 would have been allocated 2.0 units.
+
+- [Full worked example](full_worked_examples/allocating_to_leaves_without_limiting_parent.md). Unit test: `test_allocating_to_leaves_without_limiting_parent`
 
 
 ## Allocating to leaves when redistribution is necessary
