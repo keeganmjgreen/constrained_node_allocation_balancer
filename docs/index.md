@@ -1,3 +1,9 @@
+<div align="center">
+    <img src="logo.svg" alt="Constrained Node Allocation Balancer logo" width=75% />
+</div>
+
+<br>
+
 # Constrained Node Allocation Balancer
 
 The Constrained Node Allocation Balancer is an algorithm designed for tree data structures in which:

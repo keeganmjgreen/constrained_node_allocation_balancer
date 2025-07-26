@@ -1,4 +1,5 @@
 <div align="center">
+    <img src="docs/logo.svg" alt="Constrained Node Allocation Balancer" width=50% />
     <p><a href="https://keeganmjgreen.github.io/constrained_node_allocation_balancer/index.html"><b>Docs</b></a><p>
 </div>
 
