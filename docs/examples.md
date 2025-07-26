@@ -24,6 +24,7 @@ This example consists of a simple two-level tree with one root (node 1, with a l
 
     ```python
     from constrained_node_allocation_balancer import (
+        LeafNode,
         Node,
         constrained_node_allocation_balancer,
     )
@@ -31,8 +32,8 @@ This example consists of a simple two-level tree with one root (node 1, with a l
     root = Node(
         limit=2,
         children=[
-            Node(limit=2),
-            Node(limit=1),
+            LeafNode(limit=2),
+            LeafNode(limit=1),
         ],
     )
 
@@ -82,6 +83,7 @@ If the root had no limit, or its limit was at least the sum of the leaves' limit
 
     ```python
     from constrained_node_allocation_balancer import (
+        LeafNode,
         Node,
         constrained_node_allocation_balancer,
     )
@@ -89,9 +91,9 @@ If the root had no limit, or its limit was at least the sum of the leaves' limit
     root = Node(
         limit=15,
         children=[
-            Node(limit=6),
-            Node(limit=1),
-            Node(limit=9),
+            LeafNode(limit=6),
+            LeafNode(limit=1),
+            LeafNode(limit=9),
         ],
     )
     constrained_node_allocation_balancer(root)
@@ -137,6 +139,7 @@ flowchart TD
 
     ```python
     from constrained_node_allocation_balancer import (
+        LeafNode,
         Node,
         constrained_node_allocation_balancer,
     )
@@ -145,15 +148,15 @@ flowchart TD
         children=[
             Node(
                 children=[
-                    Node(limit=1),
-                    Node(limit=2),
+                    LeafNode(limit=1),
+                    LeafNode(limit=2),
                 ],
             ),
             Node(
                 limit=2,
                 children=[
-                    Node(limit=1),
-                    Node(limit=2),
+                    LeafNode(limit=1),
+                    LeafNode(limit=2),
                 ],
             ),
         ],
@@ -210,6 +213,7 @@ This example shows how the algorithm does not allocate to nodes evenly, but in p
 
     ```python
     from constrained_node_allocation_balancer import (
+        LeafNode,
         Node,
         constrained_node_allocation_balancer,
     )
@@ -217,16 +221,16 @@ This example shows how the algorithm does not allocate to nodes evenly, but in p
     root = Node(
         limit=4,
         children=[
-            Node(limit=1),
+            LeafNode(limit=1),
             Node(
                 children=[
-                    Node(limit=2),
+                    LeafNode(limit=2),
                 ]
             ),
             Node(
                 children=[
-                    Node(limit=3),
-                    Node(limit=4),
+                    LeafNode(limit=3),
+                    LeafNode(limit=4),
                 ]
             ),
         ],
@@ -283,6 +287,7 @@ As part of its functioning, the algorithm adjusts the limits of any nodes that d
 
     ```python
     from constrained_node_allocation_balancer import (
+        LeafNode,
         Node,
         constrained_node_allocation_balancer,
     )
@@ -291,11 +296,11 @@ As part of its functioning, the algorithm adjusts the limits of any nodes that d
         children=[
             Node(
                 limit=20,  # Inactive limit; will be adjusted to `10`.
-                children=[Node(limit=10)],
+                children=[LeafNode(limit=10)],
             ),
             Node(
                 limit=80,  # Active limit.
-                children=[Node(limit=100)],
+                children=[LeafNode(limit=100)],
             ),
         ],
     )
@@ -346,6 +351,7 @@ flowchart TD
 
     ```python
     from constrained_node_allocation_balancer import (
+        LeafNode,
         Node,
         constrained_node_allocation_balancer,
     )
@@ -357,17 +363,17 @@ flowchart TD
                 children=[
                     Node(
                         limit=2,  # Inactive limit; will be adjusted to `1`.
-                        children=[Node(limit=1)],
+                        children=[LeafNode(limit=1)],
                     ),
                     Node(
                         limit=8,  # Active limit.
-                        children=[Node(limit=10)],
+                        children=[LeafNode(limit=10)],
                     ),
                 ],
             ),
             Node(
                 limit=80,  # Active limit.
-                children=[Node(limit=100)],
+                children=[LeafNode(limit=100)],
             ),
         ],
     )

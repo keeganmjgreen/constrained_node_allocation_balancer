@@ -9,11 +9,11 @@ The following example shows how the 'fair internet bandwidth' problem can be sol
 ```python
 import dataclasses
 
-from constrained_node_allocation_balancer import Node
+from constrained_node_allocation_balancer import LeafNode
 
 
 @dataclasses.dataclass
-class InternetUser(Node):
+class InternetUser(LeafNode):
     requested_speed_mbps: float
     max_speed_mbps: float = float("inf")
 
@@ -57,7 +57,7 @@ The `InternetUser` subclass of `Node` is changed to the following to solve the v
 
 ```python
 @dataclasses.dataclass
-class InternetUser(Node):
+class InternetUser(LeafNode):
     requested_speed_mbps: float
     max_speed_mbps: float = float("inf")
 

@@ -9,11 +9,11 @@ The Constrained Node Allocation Balancer algorithm can be used to solve this pro
 ```python
 import dataclasses
 
-from constrained_node_allocation_balancer import Node
+from constrained_node_allocation_balancer import LeafNode
 
 
 @dataclasses.dataclass
-class GridUser(Node):
+class GridUser(LeafNode):
     nonoptional_net_load_kw: float
     optional_net_load_kw: float
 

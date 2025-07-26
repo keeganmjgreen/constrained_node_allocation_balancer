@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import math
 from itertools import groupby
-from typing import Any, Literal
+from typing import Any, Literal, override
 
 import python_to_mermaid
 
@@ -11,20 +11,12 @@ from ascii_barplot import make_ascii_barplot, make_ascii_barplot_with_marker
 from utils import pad
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class Node:
     id: str = dataclasses.field(init=False)
     _id_suffix: str = dataclasses.field(init=False)
     limit: float = float("inf")
-    conversion_factor: float = 1.0
-    """For leaf nodes only, a factor by which to multiply the units of the allocation to convert to
-    the units of the limit.
-    """
-    shift_constant: float = 0.0
-    """For leaf nodes only, a constant to subtract from the allocation of a parent before
-    distributing among its children, after which the constant is added again.
-    """
-    children: list[Node] = dataclasses.field(default_factory=list)
+    children: list[Node]
     parent: Node | None = dataclasses.field(default=None, repr=False)
     level: int = dataclasses.field(init=False, repr=False)
     allocation: float = 0.0
@@ -56,15 +48,15 @@ class Node:
 
     @property
     def remaining_budget(self) -> float:
-        return self.limit - self.allocation * self.conversion_factor
+        return self.limit - self.allocation
 
     @property
     def limit_exceeded(self) -> bool:
-        return self.allocation * self.conversion_factor > self.limit
+        return self.allocation > self.limit
 
     @property
     def has_headroom(self) -> bool:
-        return self.allocation * self.conversion_factor < self.limit
+        return self.allocation < self.limit
 
     # ==============================================================================================
     # Methods concerning the structure of the tree:
@@ -273,3 +265,32 @@ class Node:
                 blank=blank,
             )
         return f"|{barplot}"
+
+
+@dataclasses.dataclass(kw_only=True)
+class LeafNode(Node):
+    children: list[Node] = dataclasses.field(init=False, default_factory=list)
+
+    conversion_factor: float = 1.0
+    """A factor by which to multiply the units of the allocation to convert to the units of the
+    limit.
+    """
+    shift_constant: float = 0.0
+    """A constant to subtract from the allocation of a parent before distributing among its
+    children, after which the constant is added again.
+    """
+
+    @override
+    @property
+    def remaining_budget(self) -> float:
+        return self.limit - self.allocation * self.conversion_factor
+
+    @override
+    @property
+    def limit_exceeded(self) -> bool:
+        return self.allocation * self.conversion_factor > self.limit
+
+    @override
+    @property
+    def has_headroom(self) -> bool:
+        return self.allocation * self.conversion_factor < self.limit
