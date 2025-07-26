@@ -11,5 +11,3 @@ Subject to the nodes' limits, the algorithm assigns the largest possible allocat
 ## Applications
 
 This algorithm is useful in any application where some concept of fairness is constrained by tree or network-like limits. For example, giving internet or network users maximum possible bandwidth, subject to network constraints, without arbitrarily giving one user more bandwidth than another. Or, giving electricity consumers maximum possible power, subject to electricity grid constraints, without arbitrarily giving one consumer more power than another.
-
-TODO cater specifically to this type of usage

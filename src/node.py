@@ -16,6 +16,10 @@ class Node:
     id: str = dataclasses.field(init=False)
     _id_suffix: str = dataclasses.field(init=False)
     limit: float = float("inf")
+    conversion_factor: float = 1.0
+    """For leaf nodes only, a factor by which to multiply the units of the allocation to convert to
+    the units of the limit.
+    """
     children: list[Node] = dataclasses.field(default_factory=list)
     parent: Node | None = dataclasses.field(default=None, repr=False)
     level: int = dataclasses.field(init=False, repr=False)
@@ -48,15 +52,15 @@ class Node:
 
     @property
     def remaining_budget(self) -> float:
-        return self.limit - self.allocation
+        return self.limit - self.allocation * self.conversion_factor
 
     @property
     def limit_exceeded(self) -> bool:
-        return self.allocation > self.limit
+        return self.allocation * self.conversion_factor > self.limit
 
     @property
     def has_headroom(self) -> bool:
-        return self.allocation < self.limit
+        return self.allocation * self.conversion_factor < self.limit
 
     # ==============================================================================================
     # Methods concerning the structure of the tree:
@@ -123,9 +127,14 @@ class Node:
             return [self]  # We are the leaf.
 
     @property
-    def n_leaves_at_or_below(self) -> int:
-        """Return the number of leaves under the node, or `1` if the node is a leaf."""
-        return len(self.all_leaves)
+    def n_leaves_at_or_below(self) -> float:
+        """Return the number of leaves under the node, or 1 if the node is a leaf.
+
+        If there are non-1.0 conversion factors, this returns the number of leaves adjusted by their
+        conversion factors.
+        """
+
+        return sum(leaf.conversion_factor for leaf in self.all_leaves)
 
     @property
     def all_leaf_allocations(self) -> dict[str, float]:
