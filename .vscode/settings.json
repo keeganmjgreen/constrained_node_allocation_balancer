@@ -23,5 +23,6 @@
         "dataclass",
         "dataclasses",
         "mbps",
+        "nonoptional"
     ],
 }

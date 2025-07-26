@@ -70,13 +70,19 @@ def _balance_allocations(tree: Node, logger: Callable) -> None:
                     siblings_with_headroom = node.siblings_with_headroom
                     for sibling in siblings_with_headroom:
                         sibling.allocation += (
-                            excess
+                            (
+                                excess
+                                - sum(
+                                    sibling.sum_of_shift_constants_at_or_below
+                                    for sibling in siblings_with_headroom
+                                )
+                            )
                             / sum(
                                 sibling.n_leaves_at_or_below
                                 for sibling in siblings_with_headroom
                             )
                             * sibling.n_leaves_at_or_below
-                        )
+                        ) + sibling.sum_of_shift_constants_at_or_below
                     node.allocation -= excess
                     logger(
                         f"Redistributed {excess} from node {node.id} to siblings with headroom "
@@ -86,10 +92,10 @@ def _balance_allocations(tree: Node, logger: Callable) -> None:
         for node in level_nodes:
             for child in node.children:
                 child.allocation = (
-                    node.allocation
+                    (node.allocation - node.sum_of_shift_constants_at_or_below)
                     / node.n_leaves_at_or_below
                     * child.n_leaves_at_or_below
-                )
+                ) + child.sum_of_shift_constants_at_or_below
             if len(node.children) > 0:
                 logger(
                     f"Distributed {node.allocation} from node {node.id} to children "

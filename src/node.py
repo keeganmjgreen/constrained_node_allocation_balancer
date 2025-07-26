@@ -20,6 +20,10 @@ class Node:
     """For leaf nodes only, a factor by which to multiply the units of the allocation to convert to
     the units of the limit.
     """
+    shift_constant: float = 0.0
+    """For leaf nodes only, a constant to subtract from the allocation of a parent before
+    distributing among its children, after which the constant is added again.
+    """
     children: list[Node] = dataclasses.field(default_factory=list)
     parent: Node | None = dataclasses.field(default=None, repr=False)
     level: int = dataclasses.field(init=False, repr=False)
@@ -135,6 +139,10 @@ class Node:
         """
 
         return sum(leaf.conversion_factor for leaf in self.all_leaves)
+
+    @property
+    def sum_of_shift_constants_at_or_below(self) -> float:
+        return sum(leaf.shift_constant for leaf in self.all_leaves)
 
     @property
     def all_leaf_allocations(self) -> dict[str, float]:

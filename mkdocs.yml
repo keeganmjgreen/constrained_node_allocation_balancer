@@ -4,6 +4,7 @@ nav:
   - Getting Started: getting_started.md
   - The Algorithm: algorithm.md
   - The Fair Internet Bandwidth Problem: fair_internet_bandwidth_problem.md
+  - The Fair Power Curtailment Problem: fair_power_curtailment_problem.md
   - Examples: examples.md
   - Full Worked Examples:
       - Allocating to leaves: full_worked_examples/allocating_to_leaves.md
