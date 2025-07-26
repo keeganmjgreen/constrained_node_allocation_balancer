@@ -20,5 +20,7 @@
     "python.testing.unittestEnabled": false,
     "cSpell.words": [
         "barplot",
+        "dataclass",
+        "dataclasses",
     ],
 }
