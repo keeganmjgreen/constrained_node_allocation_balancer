@@ -876,6 +876,7 @@
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">constrained_node_allocation_balancer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LeafNode</span><span class="p">,</span>
     <span class="n">Node</span><span class="p">,</span>
     <span class="n">constrained_node_allocation_balancer</span><span class="p">,</span>
 <span class="p">)</span>
@@ -883,8 +884,8 @@
 <span class="n">root</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
     <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-        <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
     <span class="p">],</span>
 <span class="p">)</span>
 
@@ -925,6 +926,7 @@
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">constrained_node_allocation_balancer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LeafNode</span><span class="p">,</span>
     <span class="n">Node</span><span class="p">,</span>
     <span class="n">constrained_node_allocation_balancer</span><span class="p">,</span>
 <span class="p">)</span>
@@ -932,9 +934,9 @@
 <span class="n">root</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
     <span class="n">limit</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
     <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
-        <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">9</span><span class="p">),</span>
+        <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
+        <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">9</span><span class="p">),</span>
     <span class="p">],</span>
 <span class="p">)</span>
 <span class="n">constrained_node_allocation_balancer</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
@@ -973,6 +975,7 @@
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">constrained_node_allocation_balancer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LeafNode</span><span class="p">,</span>
     <span class="n">Node</span><span class="p">,</span>
     <span class="n">constrained_node_allocation_balancer</span><span class="p">,</span>
 <span class="p">)</span>
@@ -981,15 +984,15 @@
     <span class="n">children</span><span class="o">=</span><span class="p">[</span>
         <span class="n">Node</span><span class="p">(</span>
             <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-                <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
             <span class="p">],</span>
         <span class="p">),</span>
         <span class="n">Node</span><span class="p">(</span>
             <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-                <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
             <span class="p">],</span>
         <span class="p">),</span>
     <span class="p">],</span>
@@ -1037,6 +1040,7 @@
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">constrained_node_allocation_balancer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LeafNode</span><span class="p">,</span>
     <span class="n">Node</span><span class="p">,</span>
     <span class="n">constrained_node_allocation_balancer</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1044,16 +1048,16 @@
 <span class="n">root</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
     <span class="n">limit</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="n">Node</span><span class="p">(</span>
             <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+                <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
             <span class="p">]</span>
         <span class="p">),</span>
         <span class="n">Node</span><span class="p">(</span>
             <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-                <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
-                <span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+                <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+                <span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
             <span class="p">]</span>
         <span class="p">),</span>
     <span class="p">],</span>
@@ -1099,6 +1103,7 @@
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">constrained_node_allocation_balancer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LeafNode</span><span class="p">,</span>
     <span class="n">Node</span><span class="p">,</span>
     <span class="n">constrained_node_allocation_balancer</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1107,11 +1112,11 @@
     <span class="n">children</span><span class="o">=</span><span class="p">[</span>
         <span class="n">Node</span><span class="p">(</span>
             <span class="n">limit</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>  <span class="c1"># Inactive limit; will be adjusted to `10`.</span>
-            <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)],</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)],</span>
         <span class="p">),</span>
         <span class="n">Node</span><span class="p">(</span>
             <span class="n">limit</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>  <span class="c1"># Active limit.</span>
-            <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)],</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)],</span>
         <span class="p">),</span>
     <span class="p">],</span>
 <span class="p">)</span>
@@ -1155,6 +1160,7 @@
 </div>
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">constrained_node_allocation_balancer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LeafNode</span><span class="p">,</span>
     <span class="n">Node</span><span class="p">,</span>
     <span class="n">constrained_node_allocation_balancer</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1166,17 +1172,17 @@
             <span class="n">children</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">Node</span><span class="p">(</span>
                     <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="c1"># Inactive limit; will be adjusted to `1`.</span>
-                    <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)],</span>
+                    <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)],</span>
                 <span class="p">),</span>
                 <span class="n">Node</span><span class="p">(</span>
                     <span class="n">limit</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>  <span class="c1"># Active limit.</span>
-                    <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)],</span>
+                    <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)],</span>
                 <span class="p">),</span>
             <span class="p">],</span>
         <span class="p">),</span>
         <span class="n">Node</span><span class="p">(</span>
             <span class="n">limit</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>  <span class="c1"># Active limit.</span>
-            <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">Node</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)],</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">LeafNode</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)],</span>
         <span class="p">),</span>
     <span class="p">],</span>
 <span class="p">)</span>
