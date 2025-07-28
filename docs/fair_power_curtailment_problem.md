@@ -9,43 +9,43 @@ The Constrained Node Allocation Balancer algorithm can be used to solve this pro
 ```python
 import dataclasses
 
-from constrained_node_allocation_balancer import LeafNode
+from constrained_node_allocation_balancer import LeafNode, Range
 
 
 @dataclasses.dataclass
 class GridUser(LeafNode):
-    nonoptional_net_load_kw: float
-    optional_net_load_kw: float
+    fixed_net_load_kw: float
+    dispatchable_generation: float
+    dispatchable_load: float
 
     @property
-    def limit(self) -> float:
-        return (
-            self.nonoptional_net_load_kw
-            + self.optional_net_load_kw
+    def limits(self) -> Range:
+        return Range(
+            lower=self.dispatchable_generation,
+            upper=self.dispatchable_load,
         )
 
-    @property
+        @property
     def shift_constant(self) -> float:
-        return self.nonoptional_net_load_kw
-        # assert nonnegative after subtracting
+        return self.fixed_net_load_kw
 
 
 centralized_generation := Node(
-    limit=sum(
+    upper_limit=sum(
         power_plant_output_kw,
         solar_farm_output_kw,
         wind_farm_output_kw,
     ),
     children=[
         feeder_transformer_1 := Node(
-            limit=4,
+            upper_limit=4,
             children=[
                 user_1 := GridUser(requested_net_import_kw=2),
                 user_2 := GridUser(requested_net_import_kw=3),
             ],
         ),
         feeder_transformer_2 := Node(
-            limit=4,
+            upper_limit=4,
             children=[
                 user_3 := GridUser(requested_net_import_kw=2),
                 user_4 := GridUser(requested_net_import_kw=1),

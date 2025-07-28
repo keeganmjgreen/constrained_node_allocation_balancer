@@ -1,5 +1,5 @@
 import math
-from typing import Callable
+from typing import Callable, cast
 
 from logs import Logs
 from node import Node
@@ -28,7 +28,7 @@ def _set_root_allocation(tree: Node, logger: Callable) -> None:
         ancestral_budgets = [
             n.remaining_budget
             for n in cast(list[Node], [leaf, *leaf.ancestor_chain])
-            if not math.isinf(n.limit)
+            if not math.isinf(n.limits.upper)
         ]
         if len(ancestral_budgets) == 0:
             raise AncestorChainWithoutLimitError
@@ -46,18 +46,23 @@ def _adjust_inactive_limits(tree: Node, logger: Callable) -> None:
         if level == 0:
             continue
         for node in level_nodes:
-            children_throughput = sum(n.limit for n in node.children)
-            if len(node.children) > 0 and (
-                math.isinf(node.limit) or children_throughput <= node.limit
-            ):
-                # The node has no limit, or the node's limit can never be reached due to its
-                #     children's limits. Set the node's limit to the sum of its children's limits:
-                node.limit = children_throughput
-                logger(
-                    f"Set limit of node {node.id} to the sum of its children's limits "
-                    f"{children_throughput}",
-                    tree,
+            for limit_kind in ["lower", "upper"]:
+                children_throughput = sum(
+                    getattr(n.limits, limit_kind) for n in node.children
                 )
+                node_limit = getattr(node.limits, limit_kind)
+                if len(node.children) > 0 and (
+                    math.isinf(node_limit) or children_throughput <= node_limit
+                ):
+                    # The node has no limit, or the node's limit can never be reached due to its
+                    #     children's limits. Set the node's limit to the sum of its children's
+                    #     limits:
+                    setattr(node.limits, limit_kind, children_throughput)
+                    logger(
+                        f"Set {limit_kind} limit of node {node.id} to the sum of its children's "
+                        f"{limit_kind} limits {children_throughput}",
+                        tree,
+                    )
 
 
 def _balance_allocations(tree: Node, logger: Callable) -> None:
@@ -66,7 +71,7 @@ def _balance_allocations(tree: Node, logger: Callable) -> None:
         while any(node.limit_exceeded for node in level_nodes):
             for node in level_nodes:
                 if node.limit_exceeded:
-                    excess = node.allocation - node.limit
+                    excess = node.limits.excess(node.allocation)
                     siblings_with_headroom = node.siblings_with_headroom
                     for sibling in siblings_with_headroom:
                         sibling.allocation += (

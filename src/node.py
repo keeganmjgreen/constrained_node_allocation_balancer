@@ -7,20 +7,26 @@ from typing import Any, Literal, override
 import python_to_mermaid
 
 from ascii_barplot import make_ascii_barplot, make_ascii_barplot_with_marker
+from limits import Range
 from utils import pad
 
 
 class Node:
     id: str
     _id_suffix: str
-    limit: float = float("inf")
+    limits: Range
     children: list[Node]
     parent: Node | None
     level: int
     allocation: float
 
-    def __init__(self, children: list[Node], limit: float = float("inf")):
-        self.limit = limit
+    def __init__(
+        self,
+        children: list[Node],
+        lower_limit: float = 0.0,
+        upper_limit: float = float("inf"),
+    ):
+        self.limits = Range(lower=lower_limit, upper=upper_limit)
         self.children = children
         if len(self.children) == 0:
             raise ValueError(
@@ -53,15 +59,15 @@ class Node:
 
     @property
     def remaining_budget(self) -> float:
-        return self.limit - self.allocation
+        return self.limits.upper - self.allocation
 
     @property
     def limit_exceeded(self) -> bool:
-        return self.allocation > self.limit
+        return not self.limits.contains(self.allocation)
 
     @property
     def has_headroom(self) -> bool:
-        return self.allocation < self.limit
+        return self.limits.contains(self.allocation, inclusive=False)
 
     # ==============================================================================================
     # Methods concerning the structure of the tree:
@@ -166,7 +172,9 @@ class Node:
         max_allocation = max(n.allocation for n in all_nodes)
         if max_allocation_str_len is None:
             max_allocation_str_len = len(f"{max_allocation:.3f}")
-        max_limit = max(n.limit for n in all_nodes if not math.isinf(n.limit))
+        max_limit = max(
+            n.limits.upper for n in all_nodes if not math.isinf(n.limits.upper)
+        )
         if max_limit_str_len is None:
             max_limit_str_len = len(f"{max_limit:.3f}")
         if max_value is None:
@@ -192,7 +200,11 @@ class Node:
                         f"<b>{node.id}</b>"
                         + "<br>"
                         + f"{node.allocation:.3f}"
-                        + ("" if math.isinf(node.limit) else f" / {node.limit:.3f}")
+                        + (
+                            ""
+                            if math.isinf(node.limits.upper)
+                            else f" / {node.limits.upper:.3f}"
+                        )
                         + "<br>"
                         + f"<code>{node._ascii_barplot(max_value, max_bar_width, blank=".")}</code>"
                     ),
@@ -229,8 +241,8 @@ class Node:
             + f"{pad(f'{self.allocation:.3f}', max_allocation_str_len)}"
             + (
                 " " * (4 + max_limit_str_len)
-                if math.isinf(self.limit)
-                else f" / {pad(f'{self.limit:.3f}', max_limit_str_len)} "
+                if math.isinf(self.limits.upper)
+                else f" / {pad(f'{self.limits.upper:.3f}', max_limit_str_len)} "
             )
             + self._ascii_barplot(**node_repr_kwargs)
         )
@@ -251,7 +263,7 @@ class Node:
     def _ascii_barplot(
         self, max_value: float, max_bar_width: int, blank: str = " "
     ) -> str:
-        if math.isinf(self.limit):
+        if math.isinf(self.limits.upper):
             barplot = make_ascii_barplot(
                 value=self.allocation,
                 max_value=max_value,
@@ -261,7 +273,7 @@ class Node:
         else:
             barplot = make_ascii_barplot_with_marker(
                 value=self.allocation,
-                marker=self.limit,
+                marker=self.limits.upper,
                 max_value=max_value,
                 width=max_bar_width,
                 blank=blank,
@@ -276,22 +288,24 @@ class LeafNode(Node):
     @override
     def __init__(
         self,
-        limit: float = float("inf"),
+        lower_limit: float = 0.0,
+        upper_limit: float = float("inf"),
         conversion_factor: float = 1.0,
         shift_constant: float = 0.0,
     ):
         """Create a leaf node
 
         Args:
-            limit (float, optional): Limit. Defaults to float("inf").
+            lower_limit (float, optional): Lower limit. Defaults to 0.0.
+            upper_limit (float, optional): Upper limit. Defaults to float("inf").
             conversion_factor (float, optional): A factor by which to multiply the units of the
-                allocation to convert to the units of the limit. Defaults to 1.0.
+                allocation to convert to the units of the upper limit. Defaults to 1.0.
             shift_constant (float, optional): A constant to subtract from the allocation of a parent
                 before distributing among its children, after which the constant is added again.
                 Defaults to 0.0.
         """
 
-        self.limit = limit
+        self.limits = Range(lower=lower_limit, upper=upper_limit)
         self.parent = None
         self.children = []
         # Set IDs and levels, assuming (for now) that this is the root node:
@@ -309,14 +323,16 @@ class LeafNode(Node):
     @override
     @property
     def remaining_budget(self) -> float:
-        return self.limit - self.allocation * self.conversion_factor
+        return self.limits.upper - self.allocation * self.conversion_factor
 
     @override
     @property
     def limit_exceeded(self) -> bool:
-        return self.allocation * self.conversion_factor > self.limit
+        return not self.limits.contains(self.allocation * self.conversion_factor)
 
     @override
     @property
     def has_headroom(self) -> bool:
-        return self.allocation * self.conversion_factor < self.limit
+        return self.limits.contains(
+            self.allocation * self.conversion_factor, inclusive=False
+        )

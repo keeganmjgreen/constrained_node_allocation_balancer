@@ -4,7 +4,7 @@ Consider an internet network structured as a tree, in which the root node is the
 
 The 'fair internet bandwidth' problem asks how to distribute internet bandwidth fairly among users that are requesting data at different speeds, with different maximum speeds according to their internet service plans, in service areas that differ in terms of internet infrastructure.
 
-The following example shows how the 'fair internet bandwidth' problem can be solved using the Constrained Node Allocation Balancer package. A subclass of `Node` called `InternetUser` is created, defining the node's `limit` as the lesser of the user's maximum speed (per their internet service plan) and their requested speed. The algorithm evenly distributes bandwidth among users until a limit is reached---whether that of the data transfer speed being requested by a customer, or the maximum speed for a user, or of the upstream infrastructure. At this point, the algorithm redistributes excess bandwidth as fairly as possible. The algorithm would be re-executed constantly to account for users' constantly fluctuating data needs.
+The following example shows how the 'fair internet bandwidth' problem can be solved using the Constrained Node Allocation Balancer package. A subclass of `Node` called `InternetUser` is created, defining the node's `upper_limit` as the lesser of the user's maximum speed (per their internet service plan) and their requested speed. The algorithm evenly distributes bandwidth among users until a limit is reached---whether that of the data transfer speed being requested by a customer, or the maximum speed for a user, or of the upstream infrastructure. At this point, the algorithm redistributes excess bandwidth as fairly as possible. The algorithm would be re-executed constantly to account for users' constantly fluctuating data needs.
 
 ```python
 import dataclasses
@@ -18,21 +18,21 @@ class InternetUser(LeafNode):
     max_speed_mbps: float = float("inf")
 
     @property
-    def limit(self) -> float:
+    def upper_limit(self) -> float:
         return min(self.max_speed_mbps, self.requested_speed_mbps)
 
 
 streaming_service_1 := Node(
     children=[
         switch_1 := Node(
-            limit=4,
+            upper_limit=4,
             children=[
                 user_1 := InternetUser(max_speed=2, requested_speed=4),
                 user_2 := InternetUser(max_speed=3, requested_speed=3),
             ],
         ),
         switch_2 := Node(
-            limit=4,
+            upper_limit=4,
             children=[
                 user_3 := InternetUser(max_speed=4, requested_speed=2),
                 user_4 := InternetUser(max_speed=5, requested_speed=1),
@@ -53,7 +53,7 @@ In a variant of the fair internet bandwidth problem, the question is not of how 
 
 This variant focuses more than the original problem on delivering internet speeds that are in proportion to how much users pay. The variant would be a fairer approach than the original formulation if users paid a fixed monthly cost per Mbps, however rural users obviously pay more per Mbps per month than urban users (and depending on their monthly Mb limit, for that matter).
 
-The `InternetUser` subclass of `Node` is changed to the following to solve the variant, now defining a `conversion_factor` for the node. This conversion factor is a feature of the Constrained Node Allocation Balancer algorithm which allows different units to be used for their `limit` and `allocation`, for all nodes. In this case, the `limit` is in Mbps and the `allocation` is dimensionless (a fraction between 0 and 1).
+The `InternetUser` subclass of `Node` is changed to the following to solve the variant, now defining a `conversion_factor` for the node. This conversion factor is a feature of the Constrained Node Allocation Balancer algorithm which allows different units to be used for their `upper_limit` and `allocation`, for all nodes. In this case, the `upper_limit` is in Mbps and the `allocation` is dimensionless (a fraction between 0 and 1).
 
 ```python
 @dataclasses.dataclass
@@ -62,7 +62,7 @@ class InternetUser(LeafNode):
     max_speed_mbps: float = float("inf")
 
     @property
-    def limit(self) -> float:
+    def upper_limit(self) -> float:
         return min(self.max_speed_mbps, self requested_speed_mbps)
 
     @property

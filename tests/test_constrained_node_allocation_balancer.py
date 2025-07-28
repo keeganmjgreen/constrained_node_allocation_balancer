@@ -10,23 +10,26 @@ from node import LeafNode, Node
 
 def test_raising_if_any_branches_without_limit() -> None:
     with pytest.raises(AncestorChainWithoutLimitError):
-        constrained_node_allocation_balancer(LeafNode(limit=float("inf")))
+        constrained_node_allocation_balancer(LeafNode(upper_limit=float("inf")))
     with pytest.raises(AncestorChainWithoutLimitError):
         constrained_node_allocation_balancer(
             Node(
-                limit=float("inf"),
-                children=[LeafNode(limit=1), LeafNode(limit=float("inf"))],
+                upper_limit=float("inf"),
+                children=[LeafNode(upper_limit=1), LeafNode(upper_limit=float("inf"))],
             )
         )
     with pytest.raises(AncestorChainWithoutLimitError):
         constrained_node_allocation_balancer(
             Node(
-                limit=float("inf"),
+                upper_limit=float("inf"),
                 children=[
-                    LeafNode(limit=1),
+                    LeafNode(upper_limit=1),
                     Node(
-                        limit=float("inf"),
-                        children=[LeafNode(limit=1), LeafNode(limit=float("inf"))],
+                        upper_limit=float("inf"),
+                        children=[
+                            LeafNode(upper_limit=1),
+                            LeafNode(upper_limit=float("inf")),
+                        ],
                     ),
                 ],
             )
@@ -35,7 +38,7 @@ def test_raising_if_any_branches_without_limit() -> None:
 
 def test_on_one_level_tree() -> None:
     # Given:
-    root = LeafNode(limit=1)
+    root = LeafNode(upper_limit=1)
     # When:
     constrained_node_allocation_balancer(root)
     # Then:
@@ -50,10 +53,10 @@ class TestOnTwoLevelTree:
     ) -> None:
         # Given:
         root = Node(
-            limit=root_limit,
+            upper_limit=root_limit,
             children=[
-                LeafNode(limit=2),
-                LeafNode(limit=1),
+                LeafNode(upper_limit=2),
+                LeafNode(upper_limit=1),
             ],
         )
         # When:
@@ -72,10 +75,10 @@ class TestOnTwoLevelTree:
     def test_allocating_to_leaves_without_limits(self) -> None:
         # Given:
         root = Node(
-            limit=2,
+            upper_limit=2,
             children=[
-                LeafNode(limit=float("inf")),
-                LeafNode(limit=float("inf")),
+                LeafNode(upper_limit=float("inf")),
+                LeafNode(upper_limit=float("inf")),
             ],
         )
         # When:
@@ -92,10 +95,10 @@ class TestOnTwoLevelTree:
     def test_allocating_to_leaves(self) -> None:
         # Given:
         root = Node(
-            limit=2,
+            upper_limit=2,
             children=[
-                LeafNode(limit=2),
-                LeafNode(limit=1),
+                LeafNode(upper_limit=2),
+                LeafNode(upper_limit=1),
             ],
         )
         # When:
@@ -112,12 +115,12 @@ class TestOnTwoLevelTree:
     def test_allocating_to_leaves_when_redistribution_is_necessary(self) -> None:
         # Given:
         root = Node(
-            limit=15,
+            upper_limit=15,
             children=[
                 # These nodes' allocations will start at root.allocation / 3 nodes = 5 units each.
-                LeafNode(limit=6),
+                LeafNode(upper_limit=6),
                 # ^ Node 1.1's initial allocation does NOT exceed its limit.
-                LeafNode(limit=1),
+                LeafNode(upper_limit=1),
                 # ^ Node 1.2's initial allocation DOES exceed its limit, by 4.0 units.
                 #     This excess will be redistributed among the node's siblings that have
                 #     headroom, allocating 2.0 more units to each of nodes 1.1 and 1.3.
@@ -125,7 +128,7 @@ class TestOnTwoLevelTree:
                 #     unit.
                 #     This excess will be redistributed among node 1.1's remaining siblings that
                 #     have headroom (in this case, only node 1.3).
-                LeafNode(limit=9),
+                LeafNode(upper_limit=9),
                 # ^ Node 1.3's initial allocation does NOT exceed its limit (node has headroom).
             ],
         )
@@ -155,15 +158,15 @@ class TestOnThreeLevelTree:
             children=[
                 Node(
                     children=[
-                        LeafNode(limit=1),
-                        LeafNode(limit=2),
+                        LeafNode(upper_limit=1),
+                        LeafNode(upper_limit=2),
                     ],
                 ),
                 Node(
-                    limit=2,
+                    upper_limit=2,
                     children=[
-                        LeafNode(limit=1),
-                        LeafNode(limit=2),
+                        LeafNode(upper_limit=1),
+                        LeafNode(upper_limit=2),
                     ],
                 ),
             ],
@@ -187,18 +190,18 @@ class TestOnThreeLevelTree:
         """Test balancing allocation among leaves regardless of depth."""
         # Given:
         root = Node(
-            limit=4,
+            upper_limit=4,
             children=[
-                LeafNode(limit=1),
+                LeafNode(upper_limit=1),
                 Node(
                     children=[
-                        LeafNode(limit=2),
+                        LeafNode(upper_limit=2),
                     ]
                 ),
                 Node(
                     children=[
-                        LeafNode(limit=3),
-                        LeafNode(limit=4),
+                        LeafNode(upper_limit=3),
+                        LeafNode(upper_limit=4),
                     ]
                 ),
             ],
@@ -222,16 +225,16 @@ class TestOnThreeLevelTree:
         # Given:
         root = Node(
             children=[
-                LeafNode(limit=1),
+                LeafNode(upper_limit=1),
                 Node(
                     children=[
-                        LeafNode(limit=2),
+                        LeafNode(upper_limit=2),
                     ]
                 ),
                 Node(
                     children=[
-                        LeafNode(limit=3),
-                        LeafNode(limit=4),
+                        LeafNode(upper_limit=3),
+                        LeafNode(upper_limit=4),
                     ]
                 ),
             ],
@@ -258,12 +261,12 @@ class TestOnThreeLevelTree:
         root = Node(
             children=[
                 Node(
-                    limit=20,  # Inactive limit; will be adjusted to `10`.
-                    children=[LeafNode(limit=10)],
+                    upper_limit=20,  # Inactive limit; will be adjusted to `10`.
+                    children=[LeafNode(upper_limit=10)],
                 ),
                 Node(
-                    limit=80,  # Active limit.
-                    children=[LeafNode(limit=100)],
+                    upper_limit=80,  # Active limit.
+                    children=[LeafNode(upper_limit=100)],
                 ),
             ],
         )
@@ -290,21 +293,21 @@ class TestOnFourLevelTree:
         root = Node(
             children=[
                 Node(
-                    limit=20,  # Inactive limit; will be adjusted to `10`.
+                    upper_limit=20,  # Inactive limit; will be adjusted to `10`.
                     children=[
                         Node(
-                            limit=2,  # Inactive limit; will be adjusted to `1`.
-                            children=[LeafNode(limit=1)],
+                            upper_limit=2,  # Inactive limit; will be adjusted to `1`.
+                            children=[LeafNode(upper_limit=1)],
                         ),
                         Node(
-                            limit=8,  # Active limit.
-                            children=[LeafNode(limit=10)],
+                            upper_limit=8,  # Active limit.
+                            children=[LeafNode(upper_limit=10)],
                         ),
                     ],
                 ),
                 Node(
-                    limit=80,  # Active limit.
-                    children=[LeafNode(limit=100)],
+                    upper_limit=80,  # Active limit.
+                    children=[LeafNode(upper_limit=100)],
                 ),
             ],
         )

@@ -69,8 +69,8 @@ class Logs:
     @property
     def _max_limit(self) -> float:
         return max(
-            n.limit
+            n.limits.upper
             for tree in self._tree_snapshots.values()
             for n in tree.all_nodes
-            if not math.isinf(n.limit)
+            if not math.isinf(n.limits.upper)
         )

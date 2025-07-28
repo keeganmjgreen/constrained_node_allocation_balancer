@@ -30,10 +30,10 @@ This example consists of a simple two-level tree with one root (node 1, with a l
     )
 
     root = Node(
-        limit=2,
+        upper_limit=2,
         children=[
-            LeafNode(limit=2),
-            LeafNode(limit=1),
+            LeafNode(upper_limit=2),
+            LeafNode(upper_limit=1),
         ],
     )
 
@@ -89,17 +89,17 @@ If the root had no limit, or its limit was at least the sum of the leaves' limit
     )
 
     root = Node(
-        limit=15,
+        upper_limit=15,
         children=[
-            LeafNode(limit=6),
-            LeafNode(limit=1),
-            LeafNode(limit=9),
+            LeafNode(upper_limit=6),
+            LeafNode(upper_limit=1),
+            LeafNode(upper_limit=9),
         ],
     )
     constrained_node_allocation_balancer(root)
     ```
 
-The above tree has a root allocation of 15.0 units. At first, the algorithm give an initial allocation of (15.0&nbsp;units)/(3&nbsp;nodes)&nbsp;=&nbsp;5.0 units to each of the three leaf nodes. Node 1.1's and node 1.3's initial allocations do *not* exceed those nodes' limits. However, node 1.2's initial allocation *does* exceed its limit, by 4.0 units. The algorithm will redistribute this excess among the node's siblings that have *headroom* (limit&nbsp;&minus;&nbsp;allocation), allocating 2.0 more units to each of nodes 1.1 and 1.3. As a result, node 1.1's allocation will end up exceeding its limit by 1.0 unit. This excess will be redistributed among node 1.1's remaining siblings that have headroom (in this case, only node 1.3). The algorithm has thereby assigned the largest possible allocations that satisfy the root’s limit, while balancing how much is allocated among the leaves:
+The above tree has a root allocation of 15.0 units. At first, the algorithm give an initial allocation of (15.0&nbsp;units)/(3&nbsp;nodes)&nbsp;=&nbsp;5.0 units to each of the three leaf nodes. Node 1.1's and node 1.3's initial allocations do *not* exceed those nodes' limits. However, node 1.2's initial allocation *does* exceed its limit, by 4.0 units. The algorithm will redistribute this excess among the node's siblings that have *headroom* (upper_limit&nbsp;&minus;&nbsp;allocation), allocating 2.0 more units to each of nodes 1.1 and 1.3. As a result, node 1.1's allocation will end up exceeding its limit by 1.0 unit. This excess will be redistributed among node 1.1's remaining siblings that have headroom (in this case, only node 1.3). The algorithm has thereby assigned the largest possible allocations that satisfy the root’s limit, while balancing how much is allocated among the leaves:
 
 ```mermaid
 flowchart TD
@@ -148,15 +148,15 @@ flowchart TD
         children=[
             Node(
                 children=[
-                    LeafNode(limit=1),
-                    LeafNode(limit=2),
+                    LeafNode(upper_limit=1),
+                    LeafNode(upper_limit=2),
                 ],
             ),
             Node(
-                limit=2,
+                upper_limit=2,
                 children=[
-                    LeafNode(limit=1),
-                    LeafNode(limit=2),
+                    LeafNode(upper_limit=1),
+                    LeafNode(upper_limit=2),
                 ],
             ),
         ],
@@ -219,18 +219,18 @@ This example shows how the algorithm does not allocate to nodes evenly, but in p
     )
 
     root = Node(
-        limit=4,
+        upper_limit=4,
         children=[
-            LeafNode(limit=1),
+            LeafNode(upper_limit=1),
             Node(
                 children=[
-                    LeafNode(limit=2),
+                    LeafNode(upper_limit=2),
                 ]
             ),
             Node(
                 children=[
-                    LeafNode(limit=3),
-                    LeafNode(limit=4),
+                    LeafNode(upper_limit=3),
+                    LeafNode(upper_limit=4),
                 ]
             ),
         ],
@@ -295,12 +295,12 @@ As part of its functioning, the algorithm adjusts the limits of any nodes that d
     root = Node(
         children=[
             Node(
-                limit=20,  # Inactive limit; will be adjusted to `10`.
-                children=[LeafNode(limit=10)],
+                upper_limit=20,  # Inactive limit; will be adjusted to `10`.
+                children=[LeafNode(upper_limit=10)],
             ),
             Node(
-                limit=80,  # Active limit.
-                children=[LeafNode(limit=100)],
+                upper_limit=80,  # Active limit.
+                children=[LeafNode(upper_limit=100)],
             ),
         ],
     )
@@ -359,21 +359,21 @@ flowchart TD
     root = Node(
         children=[
             Node(
-                limit=20,  # Inactive limit; will be adjusted to `10`.
+                upper_limit=20,  # Inactive limit; will be adjusted to `10`.
                 children=[
                     Node(
-                        limit=2,  # Inactive limit; will be adjusted to `1`.
-                        children=[LeafNode(limit=1)],
+                        upper_limit=2,  # Inactive limit; will be adjusted to `1`.
+                        children=[LeafNode(upper_limit=1)],
                     ),
                     Node(
-                        limit=8,  # Active limit.
-                        children=[LeafNode(limit=10)],
+                        upper_limit=8,  # Active limit.
+                        children=[LeafNode(upper_limit=10)],
                     ),
                 ],
             ),
             Node(
-                limit=80,  # Active limit.
-                children=[LeafNode(limit=100)],
+                upper_limit=80,  # Active limit.
+                children=[LeafNode(upper_limit=100)],
             ),
         ],
     )
