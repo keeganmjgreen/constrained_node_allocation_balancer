@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import dataclasses
 import math
 from itertools import groupby
 from typing import Any, Literal, override
@@ -11,26 +10,29 @@ from ascii_barplot import make_ascii_barplot, make_ascii_barplot_with_marker
 from utils import pad
 
 
-@dataclasses.dataclass(kw_only=True)
 class Node:
-    id: str = dataclasses.field(init=False)
-    _id_suffix: str = dataclasses.field(init=False)
+    id: str
+    _id_suffix: str
     limit: float = float("inf")
     children: list[Node]
-    parent: Node | None = dataclasses.field(default=None, repr=False)
-    level: int = dataclasses.field(init=False, repr=False)
-    allocation: float = 0.0
+    parent: Node | None
+    level: int
+    allocation: float
 
-    def __post_init__(self) -> None:
+    def __init__(self, children: list[Node], limit: float = float("inf")):
+        self.limit = limit
+        self.children = children
         if len(self.children) == 0:
             raise ValueError(
                 "A non-leaf Node must have one or more children. Otherwise, use LeafNode."
             )
         for child in self.children:
             child.parent = self
+        self.parent = None
         # Set IDs and levels, assuming (for now) that this is the root node:
         self._set_ids()
         self._set_levels()
+        self.allocation = 0.0
 
     def _set_ids(self, starting_at: str = "1", separator: str = ".") -> None:
         self._id_suffix = starting_at
@@ -267,18 +269,37 @@ class Node:
         return f"|{barplot}"
 
 
-@dataclasses.dataclass(kw_only=True)
 class LeafNode(Node):
-    children: list[Node] = dataclasses.field(init=False, default_factory=list)
+    conversion_factor: float
+    shift_constant: float
 
-    conversion_factor: float = 1.0
-    """A factor by which to multiply the units of the allocation to convert to the units of the
-    limit.
-    """
-    shift_constant: float = 0.0
-    """A constant to subtract from the allocation of a parent before distributing among its
-    children, after which the constant is added again.
-    """
+    @override
+    def __init__(
+        self,
+        limit: float = float("inf"),
+        conversion_factor: float = 1.0,
+        shift_constant: float = 0.0,
+    ):
+        """Create a leaf node
+
+        Args:
+            limit (float, optional): Limit. Defaults to float("inf").
+            conversion_factor (float, optional): A factor by which to multiply the units of the
+                allocation to convert to the units of the limit. Defaults to 1.0.
+            shift_constant (float, optional): A constant to subtract from the allocation of a parent
+                before distributing among its children, after which the constant is added again.
+                Defaults to 0.0.
+        """
+
+        self.limit = limit
+        self.parent = None
+        self.children = []
+        # Set IDs and levels, assuming (for now) that this is the root node:
+        self._set_ids()
+        self._set_levels()
+        self.allocation = 0.0
+        self.conversion_factor = conversion_factor
+        self.shift_constant = shift_constant
 
     @override
     @property
