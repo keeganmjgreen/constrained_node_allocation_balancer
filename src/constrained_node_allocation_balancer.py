@@ -27,7 +27,7 @@ def _set_root_allocation(tree: Node, logger: Callable) -> None:
     for leaf in tree.all_leaves:
         ancestral_budgets = [
             n.remaining_budget
-            for n in [leaf, *leaf.ancestor_chain]
+            for n in cast(list[Node], [leaf, *leaf.ancestor_chain])
             if not math.isinf(n.limit)
         ]
         if len(ancestral_budgets) == 0:

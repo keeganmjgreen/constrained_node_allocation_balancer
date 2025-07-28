@@ -113,14 +113,11 @@ class Node:
     # Methods concerning leaf nodes:
 
     @property
-    def all_leaves(self) -> list[Node]:
-        if len(self.children) > 0:
-            leaves: list[Node] = []
-            for child in self.children:
-                leaves += child.all_leaves
-            return leaves
-        else:
-            return [self]  # We are the leaf.
+    def all_leaves(self) -> list[LeafNode]:
+        leaves: list[LeafNode] = []
+        for child in self.children:
+            leaves += child.all_leaves
+        return leaves
 
     @property
     def n_leaves_at_or_below(self) -> float:
@@ -279,6 +276,11 @@ class LeafNode(Node):
     """A constant to subtract from the allocation of a parent before distributing among its
     children, after which the constant is added again.
     """
+
+    @override
+    @property
+    def all_leaves(self) -> list[LeafNode]:
+        return [self]
 
     @override
     @property
