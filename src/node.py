@@ -22,6 +22,10 @@ class Node:
     allocation: float = 0.0
 
     def __post_init__(self) -> None:
+        if len(self.children) == 0:
+            raise ValueError(
+                "A non-leaf Node must have one or more children. Otherwise, use LeafNode."
+            )
         for child in self.children:
             child.parent = self
         # Set IDs and levels if this is the root node:
