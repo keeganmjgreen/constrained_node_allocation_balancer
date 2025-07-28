@@ -28,10 +28,9 @@ class Node:
             )
         for child in self.children:
             child.parent = self
-        # Set IDs and levels if this is the root node:
-        if self.parent is None:
-            self._set_ids()
-            self._set_levels()
+        # Set IDs and levels, assuming (for now) that this is the root node:
+        self._set_ids()
+        self._set_levels()
 
     def _set_ids(self, starting_at: str = "1", separator: str = ".") -> None:
         self._id_suffix = starting_at
